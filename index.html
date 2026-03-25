@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Anual · Portfólio 1120450 · Bradesco Europa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #111318;
+  --surface2: #181b22;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8e6e0;
+  --muted: #7a7870;
+  --muted2: #5a5856;
+  --accent: #c8a96e;
+  --accent2: #e8c98e;
+  --blue: #4a90d9;
+  --green: #4caf7d;
+  --red: #e05c5c;
+  --amber: #d4894a;
+  --purple: #8b7dd8;
+  --teal: #3db8a0;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-serif: 'Instrument Serif', serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── GRID NOISE BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.page { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+/* ── HERO HEADER ── */
+.hero {
+  padding: 3rem 0 2.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: end;
+}
+.hero-label {
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .75rem;
+  font-weight: 500;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  color: #fff;
+}
+.hero-title span {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--accent2);
+}
+.hero-meta { font-size: 12px; color: var(--muted); margin-top: .75rem; }
+.hero-meta strong { color: var(--text); font-weight: 400; }
+.hero-stamp {
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted2);
+  line-height: 2;
+}
+.hero-stamp .big {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: -.03em;
+  line-height: 1;
+}
+
+/* ── KPI STRIP ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0,1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+.kpi {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+  transition: background .2s;
+}
+.kpi:hover { background: var(--surface2); }
+.kpi-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .5rem;
+}
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+.kpi-delta {
+  font-size: 11px;
+  margin-top: .4rem;
+}
+.up { color: var(--green); }
+.dn { color: var(--red); }
+.nu { color: var(--muted); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 2.5rem; }
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+.section-num {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: .1em;
+  min-width: 24px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.card-title {
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.grid-65-35 { display: grid; grid-template-columns: minmax(0,1.85fr) minmax(0,1fr); gap: 1rem; }
+.grid-55-45 { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 1rem; }
+
+/* ── MONTHLY TABLE ── */
+.monthly-table { width: 100%; border-collapse: collapse; }
+.monthly-table th {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  padding: 8px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+.monthly-table th:first-child { text-align: left; }
+.monthly-table td {
+  padding: 9px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  transition: background .15s;
+}
+.monthly-table td:first-child { text-align: left; color: var(--text); font-weight: 400; }
+.monthly-table tr:hover td { background: rgba(255,255,255,0.025); }
+.monthly-table tr:last-child td { border-bottom: none; }
+.monthly-table .highlighted { background: rgba(200, 169, 110, 0.06); }
+.monthly-table .highlighted td { border-bottom-color: rgba(200,169,110,0.15); }
+.num { color: var(--muted); }
+.num-white { color: var(--text); }
+.bar-mini {
+  display: inline-block;
+  height: 4px;
+  border-radius: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: width .3s;
+}
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 20px;
+  vertical-align: middle;
+}
+.badge-green { background: rgba(76,175,125,.15); color: var(--green); border: 1px solid rgba(76,175,125,.25); }
+.badge-red { background: rgba(224,92,92,.12); color: var(--red); border: 1px solid rgba(224,92,92,.2); }
+.badge-amber { background: rgba(212,137,74,.15); color: var(--amber); border: 1px solid rgba(212,137,74,.25); }
+.badge-blue { background: rgba(74,144,217,.15); color: var(--blue); border: 1px solid rgba(74,144,217,.25); }
+.badge-purple { background: rgba(139,125,216,.15); color: var(--purple); border: 1px solid rgba(139,125,216,.25); }
+.badge-gray { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--border2); }
+
+/* ── ASSET TABLE ── */
+.asset-table { width: 100%; border-collapse: collapse; }
+.asset-table th {
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted2); padding: 8px 10px; text-align: right;
+  border-bottom: 1px solid var(--border); font-weight: 400;
+}
+.asset-table th:first-child { text-align: left; }
+.asset-table td { padding: 10px 10px; text-align: right; border-bottom: 1px solid var(--border); font-size: 12px; }
+.asset-table td:first-child { text-align: left; }
+.asset-table tr:last-child td { border-bottom: none; }
+.asset-table tr:hover td { background: rgba(255,255,255,.025); }
+.asset-name { font-size: 12px; color: var(--text); display: block; }
+.asset-sub { font-size: 10px; color: var(--muted2); display: block; margin-top: 1px; font-family: var(--font-mono); }
+
+/* ── ANALYSIS BOXES ── */
+.analysis-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; }
+.analysis-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.analysis-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.analysis-card.positive::before { background: var(--green); }
+.analysis-card.warning::before { background: var(--amber); }
+.analysis-card.neutral::before { background: var(--blue); }
+.analysis-card.risk::before { background: var(--purple); }
+.analysis-tag { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: .6rem; }
+.analysis-headline { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: #fff; margin-bottom: .5rem; line-height: 1.2; }
+.analysis-body { font-size: 11.5px; color: var(--muted); line-height: 1.65; }
+.analysis-body strong { color: var(--text); font-weight: 400; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 4px; margin-bottom: 1.25rem; }
+.tab {
+  font-size: 11px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--muted); cursor: pointer; transition: all .2s;
+  font-family: var(--font-mono);
+}
+.tab.active { background: rgba(200,169,110,.12); color: var(--accent2); border-color: rgba(200,169,110,.3); }
+.tab:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+/* ── DONUT LEGEND ── */
+.donut-legend { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+.donut-legend-item { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.donut-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.donut-pct { margin-left: auto; color: var(--text); font-weight: 400; }
+.donut-name { color: var(--muted); }
+
+/* ── SPARKLINE TABLE ── */
+.spark-col { width: 80px; }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--muted2);
+  letter-spacing: .05em;
+}
+
+/* ── WATERFALL ── */
+.waterfall-wrap { overflow-x: auto; }
+
+/* ── PRINT ── */
+@media print {
+  body { background: #fff; color: #000; }
+  :root { --bg: #fff; --surface: #f8f8f6; --surface2: #f0f0ee; --border: #e0ddd8; --text: #1a1a18; --muted: #666; --muted2: #999; }
+}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+}
+#login-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.login-box {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  margin: 1rem;
+}
+.login-logo {
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.login-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-bottom: .35rem;
+}
+.login-title span {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--accent2);
+}
+.login-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+.login-field {
+  margin-bottom: 1rem;
+}
+.login-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .4rem;
+}
+.login-field input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: .75rem 1rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+}
+.login-field input:focus {
+  border-color: var(--accent);
+}
+.login-btn {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: .85rem;
+  background: var(--accent);
+  color: #0a0c10;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.login-btn:hover { background: var(--accent2); }
+.login-btn:active { transform: scale(.98); }
+.login-error {
+  font-size: 11px;
+  color: var(--red);
+  margin-top: .75rem;
+  min-height: 1em;
+  text-align: center;
+}
+.login-shake {
+  animation: shake .35s ease;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-5px); }
+  80%      { transform: translateX(5px); }
+}
+
+/* ── SETTINGS BUTTON ── */
+.cfg-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 46px;
+  height: 46px;
+  background: var(--accent);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #0a0c10;
+  font-size: 20px;
+  z-index: 5000;
+  transition: background .2s, transform .3s;
+  box-shadow: 0 4px 20px rgba(200,169,110,.35);
+}
+.cfg-fab:hover { background: var(--accent2); transform: rotate(60deg); }
+
+/* ── SETTINGS MODAL ── */
+#cfg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(6px);
+  z-index: 8000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+#cfg-overlay.open { display: flex; }
+.cfg-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 440px;
+  margin: 1rem;
+  overflow: hidden;
+}
+.cfg-head {
+  padding: 1.4rem 1.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cfg-head-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.cfg-close-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color .2s;
+}
+.cfg-close-btn:hover { color: var(--text); }
+.cfg-section {
+  padding: 1.4rem 1.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.cfg-section:last-child { border-bottom: none; }
+.cfg-section-label {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+.cfg-field { margin-bottom: .7rem; }
+.cfg-field label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .35rem;
+}
+.cfg-field input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: .65rem .9rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+}
+.cfg-field input:focus { border-color: var(--accent); }
+.cfg-row {
+  display: flex;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+.cfg-action {
+  flex: 1;
+  padding: .65rem .5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+  text-align: center;
+}
+.cfg-action:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+.cfg-action.primary {
+  background: var(--accent);
+  color: #0a0c10;
+  border-color: var(--accent);
+  font-weight: 500;
+}
+.cfg-action.primary:hover { background: var(--accent2); border-color: var(--accent2); color: #0a0c10; }
+.cfg-msg {
+  font-size: 11px;
+  min-height: 1.2em;
+  margin-top: .6rem;
+}
+.cfg-msg.ok { color: var(--green); }
+.cfg-msg.err { color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN OVERLAY ══ -->
+<div id="login-overlay">
+  <div class="login-box" id="login-box">
+    <div class="login-logo">Bradesco Europa · Portfólio</div>
+    <div class="login-title">Bem-vinda, <span>Alessandra</span></div>
+    <p class="login-sub">Acesse seu dashboard de investimentos</p>
+    <div class="login-field">
+      <label for="login-user">Usuário</label>
+      <input type="text" id="login-user" autocomplete="username" placeholder="usuário" />
+    </div>
+    <div class="login-field">
+      <label for="login-pass">Senha</label>
+      <input type="password" id="login-pass" autocomplete="current-password" placeholder="••••••••" />
+    </div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS FAB ══ -->
+<button class="cfg-fab" onclick="openCfg()" title="Configurações">⚙</button>
+
+<!-- ══ SETTINGS MODAL ══ -->
+<div id="cfg-overlay">
+  <div class="cfg-modal">
+    <div class="cfg-head">
+      <span class="cfg-head-title">Configurações</span>
+      <button class="cfg-close-btn" onclick="closeCfg()">×</button>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-section-label">Mudar Senha</div>
+      <div class="cfg-field">
+        <label>Senha Atual</label>
+        <input type="password" id="cfg-cur" placeholder="••••••••" />
+      </div>
+      <div class="cfg-field">
+        <label>Nova Senha</label>
+        <input type="password" id="cfg-new" placeholder="••••••••" />
+      </div>
+      <div class="cfg-field">
+        <label>Confirmar Nova Senha</label>
+        <input type="password" id="cfg-cnf" placeholder="••••••••" />
+      </div>
+      <div class="cfg-row">
+        <button class="cfg-action primary" onclick="changePassword()">Salvar Nova Senha</button>
+      </div>
+      <div class="cfg-msg" id="cfg-pass-msg"></div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-section-label">Backup &amp; Restauração</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Faça o download do arquivo atual como backup, ou restaure uma versão anterior carregando um arquivo de backup.
+      </p>
+      <div class="cfg-row">
+        <button class="cfg-action primary" onclick="doBackup()">↓ Fazer Backup</button>
+        <button class="cfg-action" onclick="document.getElementById('cfg-file').click()">↑ Restaurar Backup</button>
+      </div>
+      <input type="file" id="cfg-file" accept=".html" style="display:none" onchange="doRestore(this)" />
+      <div class="cfg-msg" id="cfg-bkp-msg"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ══ HERO ══ -->
+  <header class="hero">
+    <div>
+      <div class="hero-label">Relatório Anual · Banco Bradesco Europa S.A. · Luxemburgo</div>
+      <h1 class="hero-title">Portfólio <span>1120450</span><br>Análise 2024–2025</h1>
+      <p class="hero-meta">
+        Período: <strong>Dezembro 2024 → Dezembro 2025</strong> &nbsp;·&nbsp;
+        Perfil: <strong>Moderado</strong> &nbsp;·&nbsp;
+        Moeda: <strong>USD</strong> &nbsp;·&nbsp;
+        Custódia: <strong>Bradesco Europa, Luxemburgo</strong>
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.75rem;">
+      <button onclick="openCfg()" title="Configurações" style="
+        background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+        padding:.4rem .85rem;color:var(--muted);font-family:var(--font-mono);font-size:11px;
+        cursor:pointer;display:flex;align-items:center;gap:.4rem;letter-spacing:.05em;
+        transition:border-color .2s,color .2s;">⚙ Config</button>
+      <div class="hero-stamp">
+        <span class="big">+7,37%</span>
+        rentabilidade real<br>
+        <span style="color:var(--muted);font-size:11px;">excl. aportes externos</span><br>
+        <span style="color:var(--accent);font-size:13px;margin-top:4px;display:block;">+37,5% crescimento bruto</span>
+        <span style="color:var(--green);font-size:12px;">$239.882 → $329.809</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ KPI STRIP ══ -->
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">Patrimônio Dez/2025</div>
+      <div class="kpi-value">$329.809</div>
+      <div class="kpi-delta nu">Posição final do ano</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Máximo do período</div>
+      <div class="kpi-value">$330.679</div>
+      <div class="kpi-delta nu">Novembro/2025</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Aportes no ano</div>
+      <div class="kpi-value">$69.590</div>
+      <div class="kpi-delta up">Fev + Mai + Set/2025</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Receita de Cupons</div>
+      <div class="kpi-value">$11.538</div>
+      <div class="kpi-delta up">Bonds + TDs ao longo do ano</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Rent. Real Anual</div>
+      <div class="kpi-value">+7,37%</div>
+      <div class="kpi-delta up">excluindo aportes externos</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Yield US Treasury</div>
+      <div class="kpi-value">4,05%</div>
+      <div class="kpi-delta up">vs 4,55% em Dez/24 (–50bps)</div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1 — EVOLUÇÃO MENSAL ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Evolução do Patrimônio</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="card">
+      <div style="position:relative;width:100%;height:300px;">
+        <canvas id="evChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 2 — COMPARATIVO MENSAL DE RESULTADO ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Comparativo Mensal de Resultado e Rentabilidade</span>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-65-35" style="margin-bottom:1rem;">
+      <div class="card">
+        <div class="card-title">Rentabilidade real mensal — % excl. aportes externos</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="rentChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Rentabilidade real acumulada no ano</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="rentAcumChart"></canvas></div>
+        <div style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--muted);">Total Jan–Dez/2025</span>
+          <span style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--green);">+7,37%</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:1rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;">
+      <strong style="color:var(--accent);font-weight:500;">Metodologia:</strong>
+      Rent. mensal = (Patrimônio Final &minus; Aportes Externos) &divide; Patrimônio Anterior &minus; 1.
+      Aportes externos identificados: Fev/25 +$10.000 &bull; Mai/25 +$48.090 &bull; Set/25 +$11.500 &bull; <strong style="color:var(--text);">Total $69.590</strong>.
+      Cupons, juros de TDs e ganhos de marcação a mercado s&atilde;o rentabilidade do portf&oacute;lio. Acumulado = produto encadeado das mensais.
+    </div>
+
+    <div class="card">
+      <div style="overflow-x:auto;">
+        <table class="monthly-table">
+          <thead>
+            <tr>
+              <th>M&ecirc;s</th>
+              <th>Patrim&ocirc;nio Final</th>
+              <th>Aporte Ext.</th>
+              <th>Rent. Mensal</th>
+              <th>Rent. Acum.</th>
+              <th>Var. Bruta $</th>
+              <th>Bonds</th>
+              <th>Time Deposits</th>
+              <th>Mutual Funds</th>
+              <th>Eventos</th>
+            </tr>
+          </thead>
+          <tbody id="monthly-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 3 — RESULTADO MENSAL WATERFALL ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Variação Mensal (Waterfall)</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-65-35">
+      <div class="card">
+        <div class="card-title">Resultado mês a mês vs mês anterior</div>
+        <div style="position:relative;width:100%;height:240px;"><canvas id="wfChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Retorno acumulado no ano (base Dez/24)</div>
+        <div style="position:relative;width:100%;height:240px;"><canvas id="cumChart"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 4 — ALOCAÇÃO ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Alocação por Produto</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-55-45">
+      <div class="card">
+        <div class="card-title">Composição mensal empilhada</div>
+        <div style="position:relative;width:100%;height:240px;"><canvas id="stackChart"></canvas></div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div class="card-title">Posição final — Dezembro 2025</div>
+        <div style="display:flex;gap:1.5rem;align-items:center;flex:1;">
+          <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
+            <canvas id="donutChart"></canvas>
+          </div>
+          <div class="donut-legend">
+            <div class="donut-legend-item">
+              <span class="donut-dot" style="background:#4a90d9"></span>
+              <span class="donut-name">Bonds</span>
+              <span class="donut-pct">60,44%</span>
+            </div>
+            <div class="donut-legend-item">
+              <span class="donut-dot" style="background:#d4894a"></span>
+              <span class="donut-name">Time Deposits</span>
+              <span class="donut-pct">32,49%</span>
+            </div>
+            <div class="donut-legend-item">
+              <span class="donut-dot" style="background:#8b7dd8"></span>
+              <span class="donut-name">Mutual Funds</span>
+              <span class="donut-pct">5,89%</span>
+            </div>
+            <div class="donut-legend-item">
+              <span class="donut-dot" style="background:#5a5856"></span>
+              <span class="donut-name">Cash</span>
+              <span class="donut-pct">1,18%</span>
+            </div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:1rem;margin-top:1rem;">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:.5rem;letter-spacing:.05em;text-transform:uppercase;">Evolução da alocação em Bonds</div>
+          <div style="position:relative;height:60px;"><canvas id="bondsPctChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 5 — DETALHAMENTO ATIVOS ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Detalhamento dos Ativos</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('bonds')">Bonds (2)</button>
+      <button class="tab" onclick="showTab('td')">Time Deposits (4)</button>
+      <button class="tab" onclick="showTab('mf')">Mutual Fund (1)</button>
+    </div>
+
+    <div id="tab-bonds">
+      <div class="card">
+        <table class="asset-table">
+          <thead><tr>
+            <th>Ativo</th><th>ISIN</th><th>Rating</th>
+            <th>Face Value</th><th>Preço Compra</th><th>Preço Dez/25</th>
+            <th>Yield Compra</th><th>Yield Merc.</th><th>Accrued</th><th>Valor Posição</th><th>% Portf.</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="asset-name">US Treasury T 4⅜ 05/15/34</span>
+                <span class="asset-sub">Venc. 15/05/2034 · Cupom 4,375% sem.</span>
+              </td>
+              <td><span class="asset-sub">US91282CKQ32</span></td>
+              <td><span class="badge badge-gray">NR</span></td>
+              <td class="num-white">$144.000</td>
+              <td class="num">100,21</td>
+              <td class="num-white">102,19</td>
+              <td class="num">4,35%</td>
+              <td class="up">4,05%</td>
+              <td class="num">$800,55</td>
+              <td class="num-white"><strong>$147.951</strong></td>
+              <td><span class="badge badge-blue">44,86%</span></td>
+            </tr>
+            <tr>
+              <td>
+                <span class="asset-name">General Mills GIS 4.95 03/29/33</span>
+                <span class="asset-sub">Venc. 29/03/2033 · Cupom 4,95% sem. · Compra Mai/25</span>
+              </td>
+              <td><span class="asset-sub">US370334CT90</span></td>
+              <td><span class="badge badge-blue">BBB</span></td>
+              <td class="num-white">$50.000</td>
+              <td class="num">97,75</td>
+              <td class="num-white">101,50</td>
+              <td class="num">5,30%</td>
+              <td class="up">4,69%</td>
+              <td class="num">$632,50</td>
+              <td class="num-white"><strong>$51.381</strong></td>
+              <td><span class="badge badge-blue">15,58%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:1rem;">
+        <div class="card-title" style="margin-bottom:.75rem;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Evolução do preço de mercado — US Treasury</div>
+        <div class="card">
+          <div style="position:relative;width:100%;height:140px;"><canvas id="bondPriceChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-td" style="display:none;">
+      <div class="card">
+        <table class="asset-table">
+          <thead><tr>
+            <th>Conta</th><th>Taxa</th><th>Principal</th><th>Abertura</th><th>Vencimento</th><th>Prazo</th><th>Juros Acum.</th><th>Saldo Dez/25</th><th>% Portf.</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="asset-name">TD 210014442</span><span class="asset-sub">IBAN: LU30 1331 1204 5000 0</span></td>
+              <td><span class="badge badge-amber">5,44% a.a.</span></td>
+              <td class="num-white">$20.000</td><td class="num">28/06/2024</td><td class="num">18/06/2026</td>
+              <td class="num">720 dias</td><td class="up">+$580</td><td class="num-white"><strong>$20.580</strong></td>
+              <td><span class="badge badge-gray">6,24%</span></td>
+            </tr>
+            <tr>
+              <td><span class="asset-name">TD 210014443</span><span class="asset-sub">Prazo mais longo (4 anos)</span></td>
+              <td><span class="badge badge-amber">5,44% a.a.</span></td>
+              <td class="num-white">$35.000</td><td class="num">28/06/2024</td><td class="num">07/06/2028</td>
+              <td class="num">1.440 dias</td><td class="up">+$1.015</td><td class="num-white"><strong>$36.015</strong></td>
+              <td><span class="badge badge-gray">10,92%</span></td>
+            </tr>
+            <tr>
+              <td><span class="asset-name">TD 210014444</span><span class="asset-sub">Prazo intermediário (3 anos)</span></td>
+              <td><span class="badge badge-amber">5,44% a.a.</span></td>
+              <td class="num-white">$35.000</td><td class="num">28/06/2024</td><td class="num">14/06/2027</td>
+              <td class="num">1.081 dias</td><td class="up">+$1.010</td><td class="num-white"><strong>$36.010</strong></td>
+              <td><span class="badge badge-gray">10,92%</span></td>
+            </tr>
+            <tr>
+              <td><span class="asset-name">TD 210015888</span><span class="asset-sub">Aberto Mar/2025 — taxa menor</span></td>
+              <td><span class="badge badge-green">4,70% a.a.</span></td>
+              <td class="num-white">$14.000</td><td class="num">06/03/2025</td><td class="num">24/02/2027</td>
+              <td class="num">720 dias</td><td class="up">+$550</td><td class="num-white"><strong>$14.550</strong></td>
+              <td><span class="badge badge-gray">4,41%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="tab-mf" style="display:none;">
+      <div class="card">
+        <table class="asset-table">
+          <thead><tr>
+            <th>Fundo</th><th>ISIN</th><th>Qtd. Cotas</th><th>Preço Compra</th><th>NAV Dez/25</th><th>Valor Investido</th><th>Valor Posição</th><th>Retorno</th><th>% Portf.</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td>
+                <span class="asset-name">Bradesco Int. Conservative R</span>
+                <span class="asset-sub">AFH - Bradesco International Discretionary · Compra Jul/25, amp. Out/25</span>
+              </td>
+              <td><span class="asset-sub">LU1472289963</span></td>
+              <td class="num-white">159,275</td>
+              <td class="num">$119,29</td>
+              <td class="num-white">$121,98</td>
+              <td class="num">$18.999,91</td>
+              <td class="num-white"><strong>$19.428</strong></td>
+              <td class="up">+$428 (+2,3%)</td>
+              <td><span class="badge badge-purple">5,89%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 6 — YIELDS ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">Análise de Yield dos Bonds</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Yield de mercado mensal (%)</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="yieldChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Evolução do preço de mercado — ambos os bonds</div>
+        <div style="position:relative;width:100%;height:200px;"><canvas id="bothPriceChart"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 7 — FLUXO DE CAIXA ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Fluxo de Caixa e Eventos do Período</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="card">
+      <table class="asset-table">
+        <thead><tr>
+          <th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor (USD)</th><th>Saldo após</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="asset-sub">Dez/2024</span></td>
+            <td><span class="badge badge-gray">Custódia</span></td>
+            <td><span class="asset-sub">Custody Fee Q4-2024</span></td>
+            <td class="dn">–$37,63</td>
+            <td class="num">$239.882</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Fev/2025</span></td>
+            <td><span class="badge badge-green">Aporte</span></td>
+            <td><span class="asset-sub">2× transferências Alessandra Sales Rolim Bertoni</span></td>
+            <td class="up">+$10.000</td>
+            <td class="num">$255.266</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Mar/2025</span></td>
+            <td><span class="badge badge-amber">Investimento</span></td>
+            <td><span class="asset-sub">Abertura TD 210015888 — 4,70% a.a., 720 dias, venc. 24/02/2027</span></td>
+            <td class="dn">–$14.000</td>
+            <td class="num">$256.836</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Mar/2025</span></td>
+            <td><span class="badge badge-gray">Custódia</span></td>
+            <td><span class="asset-sub">Custody Fee Q1-2025 — $35,25</span></td>
+            <td class="dn">–$35,25</td>
+            <td class="num">$256.836</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Mai/2025</span></td>
+            <td><span class="badge badge-green">Aporte</span></td>
+            <td><span class="asset-sub">Transferência Alessandra S.R. Bertoni</span></td>
+            <td class="up">+$48.090</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Mai/2025</span></td>
+            <td><span class="badge badge-blue">Cupom</span></td>
+            <td><span class="asset-sub">Pagamento semestral US Treasury T 4⅜ — referente Nov/24–Mai/25</span></td>
+            <td class="up">+$3.150</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Mai/2025</span></td>
+            <td><span class="badge badge-amber">Compra</span></td>
+            <td><span class="asset-sub">Compra $50k General Mills GIS 4.95 — preço 97,749 + comissão $250</span></td>
+            <td class="dn">–$49.475</td>
+            <td class="num">$305.273</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Jun/2025</span></td>
+            <td><span class="badge badge-blue">Juros TDs</span></td>
+            <td><span class="asset-sub">Pagamento anual TDs 442/443/444 — juros acumulados 12 meses</span></td>
+            <td class="up">+$4.901</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Jun/2025</span></td>
+            <td><span class="badge badge-gray">Custódia</span></td>
+            <td><span class="asset-sub">Custody Fee Q2-2025 — $42,09</span></td>
+            <td class="dn">–$42,09</td>
+            <td class="num">$308.526</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Jul/2025</span></td>
+            <td><span class="badge badge-purple">Fundo</span></td>
+            <td><span class="asset-sub">Compra 59,672 cotas Bradesco Int. Conservative R — NAV $117,307</span></td>
+            <td class="dn">–$6.999,95</td>
+            <td class="num">$308.700</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Set/2025</span></td>
+            <td><span class="badge badge-green">Aporte</span></td>
+            <td><span class="asset-sub">Transferências Alessandra S.R. Bertoni + depósito</span></td>
+            <td class="up">+$11.500</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Set/2025</span></td>
+            <td><span class="badge badge-blue">Cupom</span></td>
+            <td><span class="asset-sub">Cupom semestral General Mills GIS 4.95 — $1.237,50</span></td>
+            <td class="up">+$1.237,50</td>
+            <td class="num">—</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Set/2025</span></td>
+            <td><span class="badge badge-gray">Custódia</span></td>
+            <td><span class="asset-sub">Custody Fee Q3-2025 — $50,56</span></td>
+            <td class="dn">–$50,56</td>
+            <td class="num">$326.090</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Out/2025</span></td>
+            <td><span class="badge badge-purple">Fundo</span></td>
+            <td><span class="asset-sub">Compra 99,603 cotas adicionais Bradesco Int. Conservative R</span></td>
+            <td class="dn">–$11.999,96</td>
+            <td class="num">$327.894</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Nov/2025</span></td>
+            <td><span class="badge badge-blue">Cupom</span></td>
+            <td><span class="asset-sub">Cupom semestral US Treasury T 4⅜ — referente Mai–Nov/2025</span></td>
+            <td class="up">+$3.150</td>
+            <td class="num">$330.679</td>
+          </tr>
+          <tr>
+            <td><span class="asset-sub">Dez/2025</span></td>
+            <td><span class="badge badge-gray">Custódia</span></td>
+            <td><span class="asset-sub">Custody Fee Q4-2025 — $50,73</span></td>
+            <td class="dn">–$50,73</td>
+            <td class="num">$329.809</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ SECTION 8 — ANÁLISE GERAL ══ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">Análise Geral</span>
+      <div class="section-line"></div>
+    </div>
+    <div class="analysis-grid">
+      <div class="analysis-card positive">
+        <div class="analysis-tag">Performance</div>
+        <div class="analysis-headline">Crescimento robusto de 37,5% no período</div>
+        <div class="analysis-body">O patrimônio cresceu de <strong>$239.882</strong> para <strong>$329.809</strong> entre Dez/24 e Dez/25. Grande parte do crescimento (≈$70k) é explicada pelos aportes realizados em Fev, Mai e Set/2025. O ganho de mercado líquido estimado foi de <strong>≈$20k</strong>, vindo principalmente da valorização dos bonds com a queda dos yields.</div>
+      </div>
+      <div class="analysis-card positive">
+        <div class="analysis-tag">Bonds · 60% do portfólio</div>
+        <div class="analysis-headline">Marcação a mercado favorável — yield caindo</div>
+        <div class="analysis-body">O yield do <strong>US Treasury</strong> recuou de 4,55% (Dez/24) para 4,05% (Dez/25), elevando o preço de 98,625 para 102,19. A posição valoriza ≈<strong>+$4.900</strong> somente por marcação. A <strong>General Mills</strong> comprada a 97,75 encerrou a 101,50, ganho imediato de ≈<strong>+$1.875</strong>.</div>
+      </div>
+      <div class="analysis-card warning">
+        <div class="analysis-tag">Time Deposits · 32% do portfólio</div>
+        <div class="analysis-headline">TDs com 5,44% travam retorno elevado</div>
+        <div class="analysis-body">Os três TDs originais (5,44% a.a.) oferecem retorno atrativo fixado em 2024 quando as taxas estavam altas. O TD mais recente (4,70% a.a., Mar/25) já reflete uma taxa menor. Total de juros pagos em Jun/25: <strong>$4.901</strong>. Vencimentos escalonados de 2026 a 2028 reduzem o risco de reinvestimento.</div>
+      </div>
+      <div class="analysis-card neutral">
+        <div class="analysis-tag">Mutual Fund · estreante em Jul/25</div>
+        <div class="analysis-headline">Diversificação via fundo conservador</div>
+        <div class="analysis-body">A entrada no <strong>Bradesco Int. Conservative R</strong> em Jul/25 (NAV $117,31) com ampliação em Out/25 adicionou uma classe de ativo. O NAV evoluiu para <strong>$121,98</strong> em Dez/25 (+3,9%). A posição de $19.428 representa 5,89% do portfólio e cresce gradualmente.</div>
+      </div>
+      <div class="analysis-card risk">
+        <div class="analysis-tag">Risco · Duration / Concentração</div>
+        <div class="analysis-headline">Alta duration em Bonds eleva sensibilidade à taxa</div>
+        <div class="analysis-body">Com 60% em bonds de duration longa (venc. 2033/2034), o portfólio tem <strong>alta sensibilidade a juros</strong>. Uma alta de 100bps nos yields reduziria o valor de mercado em ≈<strong>$10–12k</strong>. A queda observada dos yields em 2025 beneficiou o portfólio, mas o risco persiste se as taxas voltarem a subir.</div>
+      </div>
+      <div class="analysis-card neutral">
+        <div class="analysis-tag">Fluxo · Geração de Caixa</div>
+        <div class="analysis-headline">Cupons e juros totalizam ≈$11.538 em 2025</div>
+        <div class="analysis-body">Receitas recorrentes: <strong>$3.150</strong> cupom Treasury (Mai), <strong>$4.901</strong> juros TDs (Jun), <strong>$1.238</strong> cupom GIS (Set), <strong>$3.150</strong> cupom Treasury (Nov). Há uma boa geração de caixa disponível para reinvestimento. As taxas de custódia somaram apenas <strong>≈$178</strong> no ano — custo muito baixo.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>Portfólio 1120450 · Banco Bradesco Europa S.A. · Luxemburgo · CSSF B-18996</span>
+    <span>Gerado em Janeiro 2026 · Dados: Extratos mensais Dez/24–Dez/25 · USD</span>
+  </footer>
+
+</div><!-- /page -->
+
+<script>
+// ── DATA ──
+const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25'];
+const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809];
+const bonds  = [142821,143810,147402,148538,149476,194269,197101,196775,200029,200394,201646,200775,199331];
+const tds    = [92543, 92965, 93346,107815,108278,108756,104317,104796,105274,105737,106215,106678,107156];
+const mf     = [0,0,0,0,0,0,0,7023,7099,7165,19239,19282,19428];
+const cash   = [4518,4518,14518,483,483,2248,7107,107,107,12794,794,3944,3893];
+const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05];
+const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69];
+const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188];
+const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496];
+const bondsPct = bonds.map((b,i) => total[i]>0 ? +(b/total[i]*100).toFixed(1) : 0);
+
+// Aportes externos (transferências bancárias entradas)
+const aportes = [0, 0, 10000, 0, 0, 48090, 0, 0, 0, 11500, 0, 0, 0];
+
+// Rentabilidade mensal real = (Total[i] - Aporte[i]) / Total[i-1] - 1
+const rentMes = months.map((m,i) => {
+  if(i===0) return null;
+  return (total[i] - aportes[i]) / total[i-1] - 1;
+});
+
+// Rentabilidade acumulada encadeada
+const rentAcum = (() => {
+  let acc = 1.0;
+  return months.map((m,i) => {
+    if(i===0) return null;
+    acc *= (1 + rentMes[i]);
+    return acc - 1;
+  });
+})();
+
+const events = {
+  1:['Aportes $10k'], 2:['Novo TD 4,70%'], 4:['Aporte $48k','Compra GIS'],
+  5:['Juros TDs'], 6:['Compra Fundo'], 8:['Aportes $11,5k'], 9:['Amp. Fundo'],
+  10:['Cupom Treasury','Cupom GIS']
+};
+
+const gc = { grid:'rgba(255,255,255,0.05)', tick:'rgba(255,255,255,0.35)' };
+const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
+const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span class="dn">') + (v*100).toFixed(dec)+'%</span>';
+
+// ── MONTHLY TABLE ──
+(function buildTable(){
+  const tb = document.getElementById('monthly-body');
+  const maxVal = Math.max(...total);
+  for(let i=0;i<months.length;i++){
+    const prev = i>0 ? total[i-1] : null;
+    const delta = prev !== null ? total[i]-prev : null;
+    const rent = rentMes[i];
+    const acum = rentAcum[i];
+    const isLast = i===months.length-1;
+    const evArr = events[i] || [];
+    const tr = document.createElement('tr');
+    if(isLast) tr.className = 'highlighted';
+    
+    const deltaStr = delta===null ? '<span class="muted2">base</span>' :
+      (delta>=0?'<span class="up">+':'<span class="dn">')+
+      '$'+Math.abs(delta).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</span>';
+    const barW = Math.round((total[i]/maxVal)*56);
+    const barColor = rent===null?'#4a90d9':rent>=0?'#4caf7d':'#e05c5c';
+    const aporteStr = aportes[i]>0
+      ? '<span class="badge badge-green">+$'+aportes[i].toLocaleString('pt-BR')+'</span>'
+      : '<span class="muted2">—</span>';
+
+    // Highlight row based on rent
+    if(rent!==null && rent<0) tr.style.background='rgba(224,92,92,0.04)';
+    
+    tr.innerHTML = `
+      <td style="font-family:var(--font-mono);font-size:12px;white-space:nowrap;">
+        ${months[i]}
+        <span class="bar-mini" style="width:${barW}px;background:${barColor};opacity:.7;"></span>
+      </td>
+      <td class="num-white">$${total[i].toLocaleString('pt-BR',{maximumFractionDigits:0})}</td>
+      <td style="text-align:right">${aporteStr}</td>
+      <td style="text-align:right;font-weight:${rent!==null&&Math.abs(rent)>.008?'500':'300'}">${pctFmt(rent,4)}</td>
+      <td style="text-align:right">${pctFmt(acum,4)}</td>
+      <td style="text-align:right">${deltaStr}</td>
+      <td class="num">$${bonds[i].toLocaleString('pt-BR',{maximumFractionDigits:0})}</td>
+      <td class="num">$${tds[i].toLocaleString('pt-BR',{maximumFractionDigits:0})}</td>
+      <td class="${mf[i]>0?'num':'muted2'}">$${mf[i].toLocaleString('pt-BR',{maximumFractionDigits:0})}</td>
+      <td>${evArr.map(e=>'<span class="badge badge-gray">'+e+'</span>').join(' ')}</td>
+    `;
+    tb.appendChild(tr);
+  }
+})();
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color = gc.tick;
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 11;
+
+// ── RENTABILIDADE MENSAL CHART ──
+new Chart(document.getElementById('rentChart'),{
+  type:'bar',
+  data:{
+    labels: months.slice(1),
+    datasets:[{
+      data: rentMes.slice(1).map(v=>v===null?null:+(v*100).toFixed(4)),
+      backgroundColor: rentMes.slice(1).map(v=>v===null?'transparent':v>=0?'rgba(76,175,125,0.75)':'rgba(224,92,92,0.75)'),
+      borderRadius:3, borderSkipped:false
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+        callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
+    },
+    scales:{
+      x:{grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9},callback:v=>v.toFixed(2)+'%'},border:{dash:[3,3]},
+        afterDataLimits(axis){axis.min=Math.min(axis.min,-0.5);axis.max=Math.max(axis.max,0.5);}}
+    }
+  }
+});
+
+// ── RENTABILIDADE ACUMULADA CHART ──
+new Chart(document.getElementById('rentAcumChart'),{
+  type:'line',
+  data:{
+    labels: months,
+    datasets:[{
+      data: rentAcum.map(v=>v===null?0:+(v*100).toFixed(4)),
+      borderColor:'#4caf7d',
+      backgroundColor:'rgba(76,175,125,0.08)',
+      borderWidth:2, tension:.35, fill:true,
+      pointRadius:4, pointHoverRadius:6, pointBackgroundColor:'#4caf7d'
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+        callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
+    },
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9},callback:v=>(v>=0?'+':'')+v.toFixed(2)+'%'},border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── EV CHART ──
+new Chart(document.getElementById('evChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[
+      {label:'Total',data:total,borderColor:'#c8a96e',backgroundColor:'rgba(200,169,110,0.06)',borderWidth:2.5,tension:.35,fill:true,pointRadius:4,pointHoverRadius:6,pointBackgroundColor:'#c8a96e'},
+      {label:'Bonds',data:bonds,borderColor:'#4a90d9',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
+      {label:'Time Deposits',data:tds,borderColor:'#d4894a',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
+      {label:'Mutual Funds',data:mf,borderColor:'#8b7dd8',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
+      {label:'Cash',data:cash,borderColor:'#5a5856',borderWidth:1,tension:.35,fill:false,pointRadius:0,borderDash:[4,3]},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:16,color:'rgba(255,255,255,0.5)',font:{size:10}}},
+      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}
+    },
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── WATERFALL ──
+const wfData = months.slice(1).map((m,i)=>total[i+1]-total[i]);
+const wfColors = wfData.map(v=>v>=0?'rgba(76,175,125,0.75)':'rgba(224,92,92,0.75)');
+new Chart(document.getElementById('wfChart'),{
+  type:'bar',
+  data:{
+    labels:months.slice(1),
+    datasets:[{data:wfData,backgroundColor:wfColors,borderRadius:3,borderSkipped:false}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+' $'+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0})}}}},
+    scales:{
+      x:{grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── CUMULATIVE ──
+const base = total[0];
+const cumPcts = total.map(v=>+((v/base-1)*100).toFixed(2));
+new Chart(document.getElementById('cumChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[{data:cumPcts,borderColor:'#4caf7d',backgroundColor:'rgba(76,175,125,0.08)',borderWidth:2,tension:.35,fill:true,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#4caf7d'}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' +'+ctx.raw.toFixed(2)+'%'}}},
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>(v>=0?'+':'')+v.toFixed(1)+'%'},border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── STACK ──
+new Chart(document.getElementById('stackChart'),{
+  type:'bar',
+  data:{
+    labels:months,
+    datasets:[
+      {label:'Bonds',data:bonds,backgroundColor:'rgba(74,144,217,0.75)',borderRadius:2},
+      {label:'Time Deposits',data:tds,backgroundColor:'rgba(212,137,74,0.75)',borderRadius:2},
+      {label:'Mutual Funds',data:mf,backgroundColor:'rgba(139,125,216,0.75)',borderRadius:2},
+      {label:'Cash',data:cash,backgroundColor:'rgba(90,88,86,0.75)',borderRadius:2},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},
+    scales:{
+      x:{stacked:true,grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{stacked:true,grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── DONUT ──
+new Chart(document.getElementById('donutChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Bonds','Time Deposits','Mutual Funds','Cash'],
+    datasets:[{data:[199331,107156,19428,3894],backgroundColor:['#4a90d9','#d4894a','#8b7dd8','rgba(90,88,86,0.7)'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'70%'}
+});
+
+// ── BONDS % MINI ──
+new Chart(document.getElementById('bondsPctChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[{data:bondsPct,borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,0.1)',borderWidth:1.5,tension:.35,fill:true,pointRadius:0}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw+'%'}}},
+    scales:{
+      x:{display:false},
+      y:{grid:{display:false},ticks:{color:gc.tick,font:{size:9},callback:v=>v+'%'},border:{display:false},min:55,max:65}
+    }
+  }
+});
+
+// ── BOND PRICE CHART ──
+new Chart(document.getElementById('bondPriceChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[{label:'US Treasury (preço)',data:pTreas,borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,0.08)',borderWidth:2,tension:.35,fill:true,pointRadius:3,pointHoverRadius:5}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]},min:97,max:105}
+    }
+  }
+});
+
+// ── YIELD CHART ──
+new Chart(document.getElementById('yieldChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[
+      {label:'US Treasury',data:yTreas,borderColor:'#4a90d9',borderWidth:2,tension:.35,fill:false,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#4a90d9'},
+      {label:'General Mills',data:yGM,borderColor:'#4caf7d',borderWidth:2,tension:.35,fill:false,pointRadius:3,pointHoverRadius:5,spanGaps:false,pointBackgroundColor:'#4caf7d'},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
+      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(2)+'%'}}
+    },
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9},callback:v=>v.toFixed(2)+'%'},min:3.5,max:5.5,border:{dash:[3,3]}}
+    }
+  }
+});
+
+// ── BOTH BONDS PRICE ──
+new Chart(document.getElementById('bothPriceChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[
+      {label:'US Treasury',data:pTreas,borderColor:'#4a90d9',borderWidth:2,tension:.35,fill:false,pointRadius:2,pointHoverRadius:5},
+      {label:'General Mills',data:pGM,borderColor:'#4caf7d',borderWidth:2,tension:.35,fill:false,pointRadius:2,spanGaps:false,pointHoverRadius:5},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
+      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(3)}}
+    },
+    scales:{
+      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
+      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9},callback:v=>v.toFixed(1)},border:{dash:[3,3]},min:96,max:106}
+    }
+  }
+});
+
+// ── TABS ──
+function showTab(t) {
+  ['bonds','td','mf'].forEach(id => {
+    document.getElementById('tab-'+id).style.display = id===t ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((btn,i) => {
+    btn.classList.toggle('active', ['bonds','td','mf'][i]===t);
+  });
+}
+
+// ── LOGIN & SETTINGS ──
+(function() {
+  const DEFAULT_USER = 'alessandra';
+  const DEFAULT_PASS = 'bradesco2025';
+
+  function activePass() {
+    return localStorage.getItem('pwd') || DEFAULT_PASS;
+  }
+
+  // ── Login ──
+  const overlay = document.getElementById('login-overlay');
+  if (sessionStorage.getItem('auth') === '1') overlay.style.display = 'none';
+
+  document.getElementById('login-user').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('login-pass').focus();
+  });
+  document.getElementById('login-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  window.doLogin = function() {
+    const u = document.getElementById('login-user').value.trim().toLowerCase();
+    const p = document.getElementById('login-pass').value;
+    const err = document.getElementById('login-error');
+    const box = document.getElementById('login-box');
+    if (u === DEFAULT_USER && p === activePass()) {
+      sessionStorage.setItem('auth', '1');
+      overlay.style.transition = 'opacity .4s';
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.style.display = 'none', 400);
+    } else {
+      err.textContent = 'Usuário ou senha incorretos.';
+      box.classList.remove('login-shake');
+      void box.offsetWidth;
+      box.classList.add('login-shake');
+    }
+  };
+
+  // ── Settings Modal ──
+  window.openCfg = function() {
+    document.getElementById('cfg-cur').value = '';
+    document.getElementById('cfg-new').value = '';
+    document.getElementById('cfg-cnf').value = '';
+    document.getElementById('cfg-pass-msg').textContent = '';
+    document.getElementById('cfg-bkp-msg').textContent = '';
+    document.getElementById('cfg-overlay').classList.add('open');
+  };
+
+  window.closeCfg = function() {
+    document.getElementById('cfg-overlay').classList.remove('open');
+  };
+
+  document.getElementById('cfg-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCfg();
+  });
+
+  // ── Mudar Senha ──
+  window.changePassword = function() {
+    const cur = document.getElementById('cfg-cur').value;
+    const nw  = document.getElementById('cfg-new').value;
+    const cnf = document.getElementById('cfg-cnf').value;
+    const msg = document.getElementById('cfg-pass-msg');
+
+    if (cur !== activePass()) {
+      msg.textContent = 'Senha atual incorreta.';
+      msg.className = 'cfg-msg err';
+      return;
+    }
+    if (nw.length < 6) {
+      msg.textContent = 'A nova senha deve ter ao menos 6 caracteres.';
+      msg.className = 'cfg-msg err';
+      return;
+    }
+    if (nw !== cnf) {
+      msg.textContent = 'As senhas não coincidem.';
+      msg.className = 'cfg-msg err';
+      return;
+    }
+    localStorage.setItem('pwd', nw);
+    msg.textContent = 'Senha alterada com sucesso.';
+    msg.className = 'cfg-msg ok';
+    document.getElementById('cfg-cur').value = '';
+    document.getElementById('cfg-new').value = '';
+    document.getElementById('cfg-cnf').value = '';
+  };
+
+  // ── Backup ──
+  window.doBackup = function() {
+    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const a = document.createElement('a');
+    const date = new Date().toISOString().slice(0,10);
+    a.href = URL.createObjectURL(blob);
+    a.download = 'portfolio-backup-' + date + '.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    const msg = document.getElementById('cfg-bkp-msg');
+    msg.textContent = 'Backup baixado: ' + a.download;
+    msg.className = 'cfg-msg ok';
+  };
+
+  // ── Restaurar ──
+  window.doRestore = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const msg = document.getElementById('cfg-bkp-msg');
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      if (!confirm('Restaurar o backup "' + file.name + '"? A página será recarregada com o conteúdo do arquivo.')) {
+        input.value = '';
+        return;
+      }
+      document.open();
+      document.write(e.target.result);
+      document.close();
+    };
+    reader.onerror = function() {
+      msg.textContent = 'Erro ao ler o arquivo.';
+      msg.className = 'cfg-msg err';
+    };
+    reader.readAsText(file);
+  };
+})();
+</script>
+</body>
+</html>
