@@ -323,6 +323,148 @@ body::before {
 /* ── WATERFALL ── */
 .waterfall-wrap { overflow-x: auto; }
 
+/* ── DESIGN IMPROVEMENTS ── */
+.hero { position: relative; overflow: hidden; }
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0; right: -80px;
+  width: 45%; height: 100%;
+  background: radial-gradient(ellipse at top right, rgba(200,169,110,.07) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+
+.kpi-strip { border-radius: 14px; }
+.kpi { border-bottom: 2px solid transparent; }
+.kpi:nth-child(1) { border-bottom-color: rgba(76,175,125,.4); }
+.kpi:nth-child(2) { border-bottom-color: rgba(74,144,217,.4); }
+.kpi:nth-child(3) { border-bottom-color: rgba(200,169,110,.4); }
+.kpi:nth-child(4) { border-bottom-color: rgba(200,169,110,.3); }
+.kpi:nth-child(5) { border-bottom-color: rgba(76,175,125,.4); }
+.kpi:nth-child(6) { border-bottom-color: rgba(74,144,217,.3); }
+
+.card { transition: border-color .2s, box-shadow .2s; }
+.card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+
+.section-header { padding-bottom: .25rem; }
+
+.analysis-card { transition: border-color .2s, transform .15s; }
+.analysis-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+/* ── MONTH NAVIGATOR ── */
+.month-nav-wrap {
+  margin-bottom: 2rem;
+}
+.month-nav-title {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: .75rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.month-nav-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.month-nav {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.1) transparent;
+}
+.month-nav::-webkit-scrollbar { height: 4px; }
+.month-nav::-webkit-scrollbar-track { background: transparent; }
+.month-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.mni {
+  flex-shrink: 0;
+  min-width: 80px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .7rem .85rem .6rem;
+  cursor: pointer;
+  transition: background .15s, border-color .2s, transform .15s, box-shadow .15s;
+  text-align: center;
+}
+.mni:hover { background: var(--surface2); border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.mni.sel { border-color: var(--accent); background: rgba(200,169,110,.09); box-shadow: 0 0 0 1px rgba(200,169,110,.2); }
+.mni-name { font-size: 9px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .3rem; }
+.mni-total { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; letter-spacing: -.01em; }
+.mni-rent { font-size: 9px; margin-top: .25rem; min-height: 1em; }
+.mni-bar { height: 3px; background: var(--border2); border-radius: 2px; margin-top: .45rem; overflow: hidden; }
+.mni-bar-fill { height: 100%; border-radius: 2px; }
+
+/* ── MONTH DETAIL PANEL ── */
+.month-detail {
+  display: none;
+  background: var(--surface);
+  border: 1px solid rgba(200,169,110,.35);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.month-detail::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+}
+.month-detail.open { display: block; animation: mdIn .2s ease; }
+@keyframes mdIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.md-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.md-title-wrap {}
+.md-label { font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem; }
+.md-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -.02em; }
+.md-close { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); font-size: 16px; cursor: pointer; padding: .3rem .6rem; border-radius: 6px; line-height: 1; transition: color .2s, border-color .2s; }
+.md-close:hover { color: var(--text); border-color: var(--accent); }
+.md-kpis {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.md-kpi { background: var(--surface2); padding: .85rem 1rem; }
+.md-kpi-label { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
+.md-kpi-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -.02em; line-height: 1.1; }
+.md-kpi-sub { font-size: 10px; color: var(--muted); margin-top: .25rem; }
+.md-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.md-block { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+.md-block-title { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
+.md-alloc-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .55rem; font-size: 11px; }
+.md-alloc-row:last-child { margin-bottom: 0; }
+.md-alloc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.md-alloc-name { color: var(--muted); flex: 1; }
+.md-alloc-val { color: var(--text); font-weight: 400; }
+.md-alloc-pct { color: var(--muted2); font-size: 10px; min-width: 38px; text-align: right; }
+.md-alloc-bar { height: 2px; background: var(--border2); border-radius: 1px; overflow: hidden; margin-top: .15rem; }
+.md-alloc-bar-fill { height: 100%; border-radius: 1px; }
+.md-events-list { display: flex; flex-direction: column; gap: .5rem; }
+.md-event-row { display: flex; align-items: flex-start; gap: .6rem; font-size: 11px; padding: .4rem .6rem; background: rgba(255,255,255,.025); border-radius: 6px; }
+.md-event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: .3rem; }
+.md-no-events { font-size: 11px; color: var(--muted2); font-style: italic; }
+
 /* ── PRINT ── */
 @media print {
   body { background: #fff; color: #000; }
@@ -711,6 +853,55 @@ body::before {
       <div class="kpi-label">Yield US Treasury</div>
       <div class="kpi-value">4,05%</div>
       <div class="kpi-delta up">vs 4,55% em Dez/24 (–50bps)</div>
+    </div>
+  </div>
+
+  <!-- ══ MONTH NAVIGATOR ══ -->
+  <div class="month-nav-wrap">
+    <div class="month-nav-title">Visão Mensal — clique em um mês para detalhar</div>
+    <div class="month-nav" id="month-nav"></div>
+  </div>
+
+  <!-- ══ MONTH DETAIL PANEL ══ -->
+  <div class="month-detail" id="month-detail">
+    <div class="md-head">
+      <div class="md-title-wrap">
+        <div class="md-label">Detalhamento · Mês selecionado</div>
+        <div class="md-title" id="md-title">—</div>
+      </div>
+      <button class="md-close" onclick="closeMonthDetail()">× fechar</button>
+    </div>
+    <div class="md-kpis">
+      <div class="md-kpi">
+        <div class="md-kpi-label">Patrimônio Final</div>
+        <div class="md-kpi-value" id="md-total">—</div>
+        <div class="md-kpi-sub" id="md-delta">—</div>
+      </div>
+      <div class="md-kpi">
+        <div class="md-kpi-label">Rent. Mensal</div>
+        <div class="md-kpi-value" id="md-rent">—</div>
+        <div class="md-kpi-sub" id="md-acum">—</div>
+      </div>
+      <div class="md-kpi">
+        <div class="md-kpi-label">Aporte Externo</div>
+        <div class="md-kpi-value" id="md-aporte">—</div>
+        <div class="md-kpi-sub" id="md-aporte-sub">—</div>
+      </div>
+      <div class="md-kpi">
+        <div class="md-kpi-label">Maior Posição</div>
+        <div class="md-kpi-value" id="md-top">—</div>
+        <div class="md-kpi-sub" id="md-top-sub">—</div>
+      </div>
+    </div>
+    <div class="md-body">
+      <div class="md-block">
+        <div class="md-block-title">Alocação por produto</div>
+        <div id="md-alloc"></div>
+      </div>
+      <div class="md-block">
+        <div class="md-block-title">Eventos do mês</div>
+        <div id="md-events"></div>
+      </div>
     </div>
   </div>
 
@@ -1265,6 +1456,127 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
     tb.appendChild(tr);
   }
 })();
+
+// ── MONTH NAVIGATOR ──
+const monthFull = [
+  'Dezembro 2024','Janeiro 2025','Fevereiro 2025','Março 2025','Abril 2025',
+  'Maio 2025','Junho 2025','Julho 2025','Agosto 2025','Setembro 2025',
+  'Outubro 2025','Novembro 2025','Dezembro 2025'
+];
+const allEvents = {
+  2:  [{icon:'💵', text:'Aporte externo de $10.000', type:'aporte'}],
+  3:  [{icon:'🏦', text:'Abertura TD 210015888 — 4,70% a.a., 720 dias', type:'invest'}],
+  5:  [{icon:'💵', text:'Aporte externo de $48.090', type:'aporte'},
+       {icon:'📈', text:'Compra $50k General Mills GIS 4.95 — preço 97,749', type:'compra'},
+       {icon:'💰', text:'Cupom semestral US Treasury — $3.150', type:'cupom'}],
+  6:  [{icon:'💰', text:'Pagamento anual juros TDs (442/443/444) — $4.901', type:'cupom'}],
+  7:  [{icon:'📊', text:'Compra 59,672 cotas Bradesco Int. Conservative R', type:'invest'}],
+  9:  [{icon:'💵', text:'Aporte externo de $11.500', type:'aporte'},
+       {icon:'💰', text:'Cupom semestral General Mills GIS — $1.237,50', type:'cupom'}],
+  10: [{icon:'📊', text:'Compra adicional 99,603 cotas Bradesco Int. Conservative R', type:'invest'}],
+  11: [{icon:'💰', text:'Cupom semestral US Treasury T 4⅜ — $3.150', type:'cupom'}]
+};
+const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(--blue)', cupom:'var(--accent)' };
+
+(function buildMonthNav() {
+  const nav = document.getElementById('month-nav');
+  const maxTotal = Math.max(...total);
+  const minTotal = Math.min(...total);
+  months.forEach((m, i) => {
+    const rent = rentMes[i];
+    const barW = Math.round((total[i] - minTotal) / (maxTotal - minTotal) * 100);
+    const barColor = rent === null ? '#4a90d9' : rent >= 0 ? '#4caf7d' : '#e05c5c';
+    const rentStr = rent === null
+      ? '<span style="color:var(--muted2)">base</span>'
+      : `<span style="color:${rent>=0?'var(--green)':'var(--red)'}">${rent>=0?'+':''}${(rent*100).toFixed(2)}%</span>`;
+    const el = document.createElement('div');
+    el.className = 'mni';
+    el.dataset.idx = i;
+    el.innerHTML = `
+      <div class="mni-name">${m}</div>
+      <div class="mni-total">$${(total[i]/1000).toFixed(0)}k</div>
+      <div class="mni-rent">${rentStr}</div>
+      <div class="mni-bar"><div class="mni-bar-fill" style="width:${barW}%;background:${barColor};"></div></div>
+    `;
+    el.addEventListener('click', () => showMonthDetail(i));
+    nav.appendChild(el);
+  });
+})();
+
+let selectedMonth = null;
+window.showMonthDetail = function(i) {
+  if (selectedMonth === i) { closeMonthDetail(); return; }
+  selectedMonth = i;
+  document.querySelectorAll('.mni').forEach((el,j) => el.classList.toggle('sel', j===i));
+
+  // Header
+  document.getElementById('md-title').textContent = monthFull[i];
+
+  // KPI 1 — Total
+  document.getElementById('md-total').textContent = '$' + total[i].toLocaleString('pt-BR', {maximumFractionDigits:0});
+  const prev = i > 0 ? total[i-1] : null;
+  const delta = prev !== null ? total[i] - prev : null;
+  document.getElementById('md-delta').innerHTML = delta === null ? 'Período base'
+    : (delta >= 0 ? `<span class="up">+$${delta.toLocaleString('pt-BR',{maximumFractionDigits:0})} vs mês ant.</span>`
+                  : `<span class="dn">$${delta.toLocaleString('pt-BR',{maximumFractionDigits:0})} vs mês ant.</span>`);
+
+  // KPI 2 — Rent
+  const r = rentMes[i];
+  document.getElementById('md-rent').innerHTML = r === null ? '<span style="color:var(--muted)">base</span>'
+    : `<span style="color:${r>=0?'var(--green)':'var(--red)'}">${r>=0?'+':''}${(r*100).toFixed(4)}%</span>`;
+  const ra = rentAcum[i];
+  document.getElementById('md-acum').innerHTML = ra === null ? '' : `Acum: <span style="color:${ra>=0?'var(--green)':'var(--red)'}">${ra>=0?'+':''}${(ra*100).toFixed(2)}%</span>`;
+
+  // KPI 3 — Aporte
+  const ap = aportes[i];
+  document.getElementById('md-aporte').innerHTML = ap > 0
+    ? `<span class="up">+$${ap.toLocaleString('pt-BR')}</span>`
+    : '<span style="color:var(--muted2)">—</span>';
+  document.getElementById('md-aporte-sub').textContent = ap > 0 ? 'Transferência externa' : 'Sem aportes';
+
+  // KPI 4 — Top asset
+  const assets = [{n:'Bonds',v:bonds[i],c:'#4a90d9'},{n:'TDs',v:tds[i],c:'#d4894a'},{n:'Funds',v:mf[i],c:'#8b7dd8'},{n:'Cash',v:cash[i],c:'#5a5856'}];
+  const top = assets.reduce((a,b) => a.v > b.v ? a : b);
+  document.getElementById('md-top').textContent = top.n;
+  document.getElementById('md-top-sub').textContent = '$' + top.v.toLocaleString('pt-BR',{maximumFractionDigits:0}) + ' · ' + (top.v/total[i]*100).toFixed(1)+'%';
+
+  // Allocation
+  const allocEl = document.getElementById('md-alloc');
+  allocEl.innerHTML = assets.map(a => {
+    const pct = total[i] > 0 ? (a.v/total[i]*100) : 0;
+    return `<div class="md-alloc-row">
+      <span class="md-alloc-dot" style="background:${a.c}"></span>
+      <span class="md-alloc-name">${a.n}</span>
+      <span class="md-alloc-val">$${a.v.toLocaleString('pt-BR',{maximumFractionDigits:0})}</span>
+      <span class="md-alloc-pct">${pct.toFixed(1)}%</span>
+    </div>
+    <div class="md-alloc-bar"><div class="md-alloc-bar-fill" style="width:${pct}%;background:${a.c};opacity:.8;"></div></div>`;
+  }).join('');
+
+  // Events
+  const eventsEl = document.getElementById('md-events');
+  const evList = allEvents[i] || [];
+  if (evList.length === 0) {
+    eventsEl.innerHTML = '<div class="md-no-events">Nenhum evento relevante neste mês.</div>';
+  } else {
+    eventsEl.innerHTML = '<div class="md-events-list">' +
+      evList.map(ev => `<div class="md-event-row">
+        <span class="md-event-dot" style="background:${eventColors[ev.type]||'var(--accent)'}"></span>
+        <span style="color:var(--text)">${ev.icon} ${ev.text}</span>
+      </div>`).join('') + '</div>';
+  }
+
+  // Show panel and scroll to it
+  const panel = document.getElementById('month-detail');
+  panel.classList.add('open');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+};
+
+window.closeMonthDetail = function() {
+  selectedMonth = null;
+  document.getElementById('month-detail').classList.remove('open');
+  document.querySelectorAll('.mni').forEach(el => el.classList.remove('sel'));
+};
 
 // ── CHART DEFAULTS ──
 Chart.defaults.color = gc.tick;
