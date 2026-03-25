@@ -9,14 +9,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg: #0a0c10;
-  --surface: #111318;
-  --surface2: #181b22;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --text: #e8e6e0;
-  --muted: #7a7870;
-  --muted2: #5a5856;
+  --bg: #0d1117;
+  --surface: #161c27;
+  --surface2: #1c2333;
+  --border: rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --text: #eceae4;
+  --muted: #8c9aaa;
+  --muted2: #6a7a8a;
   --accent: #c8a96e;
   --accent2: #e8c98e;
   --blue: #4a90d9;
@@ -905,20 +905,6 @@ body::before {
     </div>
   </div>
 
-  <!-- ══ SECTION 1 — EVOLUÇÃO MENSAL ══ -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-num">01</span>
-      <span class="section-title">Evolução do Patrimônio</span>
-      <div class="section-line"></div>
-    </div>
-    <div class="card">
-      <div style="position:relative;width:100%;height:300px;">
-        <canvas id="evChart"></canvas>
-      </div>
-    </div>
-  </section>
-
   <!-- ══ SECTION 2 — COMPARATIVO MENSAL DE RESULTADO ══ -->
   <section class="section">
     <div class="section-header">
@@ -968,25 +954,6 @@ body::before {
           </thead>
           <tbody id="monthly-body"></tbody>
         </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ SECTION 3 — RESULTADO MENSAL WATERFALL ══ -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-num">03</span>
-      <span class="section-title">Variação Mensal (Waterfall)</span>
-      <div class="section-line"></div>
-    </div>
-    <div class="grid-65-35">
-      <div class="card">
-        <div class="card-title">Resultado mês a mês vs mês anterior</div>
-        <div style="position:relative;width:100%;height:240px;"><canvas id="wfChart"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Retorno acumulado no ano (base Dez/24)</div>
-        <div style="position:relative;width:100%;height:240px;"><canvas id="cumChart"></canvas></div>
       </div>
     </div>
   </section>
@@ -1408,7 +1375,7 @@ const events = {
   10:['Cupom Treasury','Cupom GIS']
 };
 
-const gc = { grid:'rgba(255,255,255,0.05)', tick:'rgba(255,255,255,0.35)' };
+const gc = { grid:'rgba(255,255,255,0.08)', tick:'rgba(255,255,255,0.55)' };
 const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
 const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span class="dn">') + (v*100).toFixed(dec)+'%</span>';
 
@@ -1632,70 +1599,6 @@ new Chart(document.getElementById('rentAcumChart'),{
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
       y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9},callback:v=>(v>=0?'+':'')+v.toFixed(2)+'%'},border:{dash:[3,3]}}
-    }
-  }
-});
-
-// ── EV CHART ──
-new Chart(document.getElementById('evChart'),{
-  type:'line',
-  data:{
-    labels:months,
-    datasets:[
-      {label:'Total',data:total,borderColor:'#c8a96e',backgroundColor:'rgba(200,169,110,0.06)',borderWidth:2.5,tension:.35,fill:true,pointRadius:4,pointHoverRadius:6,pointBackgroundColor:'#c8a96e'},
-      {label:'Bonds',data:bonds,borderColor:'#4a90d9',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
-      {label:'Time Deposits',data:tds,borderColor:'#d4894a',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
-      {label:'Mutual Funds',data:mf,borderColor:'#8b7dd8',borderWidth:1.5,tension:.35,fill:false,pointRadius:2},
-      {label:'Cash',data:cash,borderColor:'#5a5856',borderWidth:1,tension:.35,fill:false,pointRadius:0,borderDash:[4,3]},
-    ]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{
-      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:16,color:'rgba(255,255,255,0.5)',font:{size:10}}},
-      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}
-    },
-    scales:{
-      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10}},border:{dash:[3,3]}},
-      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
-    }
-  }
-});
-
-// ── WATERFALL ──
-const wfData = months.slice(1).map((m,i)=>total[i+1]-total[i]);
-const wfColors = wfData.map(v=>v>=0?'rgba(76,175,125,0.75)':'rgba(224,92,92,0.75)');
-new Chart(document.getElementById('wfChart'),{
-  type:'bar',
-  data:{
-    labels:months.slice(1),
-    datasets:[{data:wfData,backgroundColor:wfColors,borderRadius:3,borderSkipped:false}]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+' $'+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0})}}}},
-    scales:{
-      x:{grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
-      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
-    }
-  }
-});
-
-// ── CUMULATIVE ──
-const base = total[0];
-const cumPcts = total.map(v=>+((v/base-1)*100).toFixed(2));
-new Chart(document.getElementById('cumChart'),{
-  type:'line',
-  data:{
-    labels:months,
-    datasets:[{data:cumPcts,borderColor:'#4caf7d',backgroundColor:'rgba(76,175,125,0.08)',borderWidth:2,tension:.35,fill:true,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#4caf7d'}]
-  },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' +'+ctx.raw.toFixed(2)+'%'}}},
-    scales:{
-      x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
-      y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>(v>=0?'+':'')+v.toFixed(1)+'%'},border:{dash:[3,3]}}
     }
   }
 });
