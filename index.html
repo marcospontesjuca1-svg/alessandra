@@ -9,9 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg: #0d1117;
-  --surface: #161c27;
-  --surface2: #1c2333;
+  --bg: #1f3258;
+  --surface: #294068;
+  --surface2: #334f7e;
   --border: rgba(255,255,255,0.10);
   --border2: rgba(255,255,255,0.18);
   --text: #eceae4;
@@ -107,7 +107,7 @@ body::before {
 /* ── KPI STRIP ── */
 .kpi-strip {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0,1fr));
+  grid-template-columns: repeat(4, minmax(0,1fr));
   gap: 1px;
   background: var(--border);
   border: 1px solid var(--border);
@@ -341,9 +341,10 @@ body::before {
 .kpi:nth-child(1) { border-bottom-color: rgba(76,175,125,.4); }
 .kpi:nth-child(2) { border-bottom-color: rgba(74,144,217,.4); }
 .kpi:nth-child(3) { border-bottom-color: rgba(200,169,110,.4); }
-.kpi:nth-child(4) { border-bottom-color: rgba(200,169,110,.3); }
-.kpi:nth-child(5) { border-bottom-color: rgba(76,175,125,.4); }
-.kpi:nth-child(6) { border-bottom-color: rgba(74,144,217,.3); }
+.kpi:nth-child(4) { border-bottom-color: rgba(76,175,125,.35); }
+.kpi:nth-child(5) { border-bottom-color: rgba(212,137,74,.4); }
+.kpi:nth-child(6) { border-bottom-color: rgba(76,175,125,.4); }
+.kpi:nth-child(7) { border-bottom-color: rgba(74,144,217,.3); }
 
 .card { transition: border-color .2s, box-shadow .2s; }
 .card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
@@ -464,6 +465,65 @@ body::before {
 .md-event-row { display: flex; align-items: flex-start; gap: .6rem; font-size: 11px; padding: .4rem .6rem; background: rgba(255,255,255,.025); border-radius: 6px; }
 .md-event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: .3rem; }
 .md-no-events { font-size: 11px; color: var(--muted2); font-style: italic; }
+
+/* ── YEAR FILTER ── */
+.year-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1rem;
+}
+.year-filter-label {
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin-right: .25rem;
+}
+.yr-btn {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  padding: 4px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: var(--font-mono);
+}
+.yr-btn.active { background: rgba(200,169,110,.12); color: var(--accent2); border-color: rgba(200,169,110,.3); }
+.yr-btn:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+/* ── FINANCIAL RESULT STRIP ── */
+.md-fin-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid rgba(200,169,110,.25);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+.md-fin-item { background: var(--bg); padding: .75rem 1rem; }
+.md-fin-item.total { background: rgba(200,169,110,.07); }
+.md-fin-label {
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .3rem;
+}
+.md-fin-val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+.md-fin-sub { font-size: 10px; color: var(--muted); margin-top: .2rem; }
 
 /* ── PRINT ── */
 @media print {
@@ -798,9 +858,9 @@ body::before {
   <header class="hero">
     <div>
       <div class="hero-label">Relatório Anual · Banco Bradesco Europa S.A. · Luxemburgo</div>
-      <h1 class="hero-title">Portfólio <span>1120450</span><br>Análise 2024–2025</h1>
+      <h1 class="hero-title">Portfólio <span>1120450</span><br>Análise <span id="hero-year-span">2024–2025</span></h1>
       <p class="hero-meta">
-        Período: <strong>Dezembro 2024 → Dezembro 2025</strong> &nbsp;·&nbsp;
+        Período: <strong id="hero-period-strong">Dezembro 2024 → Dezembro 2025</strong> &nbsp;·&nbsp;
         Perfil: <strong>Moderado</strong> &nbsp;·&nbsp;
         Moeda: <strong>USD</strong> &nbsp;·&nbsp;
         Custódia: <strong>Bradesco Europa, Luxemburgo</strong>
@@ -813,11 +873,11 @@ body::before {
         cursor:pointer;display:flex;align-items:center;gap:.4rem;letter-spacing:.05em;
         transition:border-color .2s,color .2s;">⚙ Config</button>
       <div class="hero-stamp">
-        <span class="big">+7,37%</span>
+        <span class="big" id="hero-rent-pct">+7,37%</span>
         rentabilidade real<br>
-        <span style="color:var(--muted);font-size:11px;">excl. aportes externos</span><br>
-        <span style="color:var(--accent);font-size:13px;margin-top:4px;display:block;">+37,5% crescimento bruto</span>
-        <span style="color:var(--green);font-size:12px;">$239.882 → $329.809</span>
+        <span id="hero-rent-sub" style="color:var(--muted);font-size:11px;">excl. aportes externos</span><br>
+        <span id="hero-growth" style="color:var(--accent);font-size:13px;margin-top:4px;display:block;">+37,5% crescimento bruto</span>
+        <span id="hero-range" style="color:var(--green);font-size:12px;">$239.882 → $329.809</span>
       </div>
     </div>
   </header>
@@ -825,40 +885,51 @@ body::before {
   <!-- ══ KPI STRIP ══ -->
   <div class="kpi-strip">
     <div class="kpi">
-      <div class="kpi-label">Patrimônio Dez/2025</div>
-      <div class="kpi-value">$329.809</div>
-      <div class="kpi-delta nu">Posição final do ano</div>
+      <div class="kpi-label" id="kpi-pat-label">Patrimônio Dez/2025</div>
+      <div class="kpi-value" id="kpi-pat-value">$329.809</div>
+      <div class="kpi-delta nu" id="kpi-pat-sub">Posição final do período</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Máximo do período</div>
-      <div class="kpi-value">$330.679</div>
-      <div class="kpi-delta nu">Novembro/2025</div>
+      <div class="kpi-value" id="kpi-max-value">$330.679</div>
+      <div class="kpi-delta nu" id="kpi-max-sub">Novembro/2025</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Aportes no ano</div>
-      <div class="kpi-value">$69.590</div>
-      <div class="kpi-delta up">Fev + Mai + Set/2025</div>
+      <div class="kpi-label">Aportes</div>
+      <div class="kpi-value" id="kpi-ap-value">$69.590</div>
+      <div class="kpi-delta up" id="kpi-ap-sub">Fev + Mai + Set/2025</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Receita de Cupons</div>
-      <div class="kpi-value">$11.538</div>
-      <div class="kpi-delta up">Bonds + TDs ao longo do ano</div>
+      <div class="kpi-value" id="kpi-cup-value">$7.538</div>
+      <div class="kpi-delta up" id="kpi-cup-sub">Treasury (Mai/Nov) + GIS (Set)</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Juros Acruados (TDs)</div>
+      <div class="kpi-value" id="kpi-jur-value">$5.449</div>
+      <div class="kpi-delta up" id="kpi-jur-sub">TDs 442/443/444/888 — 2025</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Rent. Real Anual</div>
-      <div class="kpi-value">+7,37%</div>
-      <div class="kpi-delta up">excluindo aportes externos</div>
+      <div class="kpi-value" id="kpi-rent-value">+7,37%</div>
+      <div class="kpi-delta up" id="kpi-rent-sub">excluindo aportes externos</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Yield US Treasury</div>
-      <div class="kpi-value">4,05%</div>
-      <div class="kpi-delta up">vs 4,55% em Dez/24 (–50bps)</div>
+      <div class="kpi-value" id="kpi-yield-value">4,05%</div>
+      <div class="kpi-delta up" id="kpi-yield-sub">vs 4,55% em Dez/24 (–50bps)</div>
     </div>
   </div>
 
   <!-- ══ MONTH NAVIGATOR ══ -->
   <div class="month-nav-wrap">
     <div class="month-nav-title">Visão Mensal — clique em um mês para detalhar</div>
+    <div class="year-filter">
+      <span class="year-filter-label">Ano:</span>
+      <button class="yr-btn active" onclick="filterYear('all')">Todos</button>
+      <button class="yr-btn" onclick="filterYear(2024)">2024</button>
+      <button class="yr-btn" onclick="filterYear(2025)">2025</button>
+    </div>
     <div class="month-nav" id="month-nav"></div>
   </div>
 
@@ -893,6 +964,25 @@ body::before {
         <div class="md-kpi-sub" id="md-top-sub">—</div>
       </div>
     </div>
+    <!-- Resultado Financeiro -->
+    <div class="md-fin-strip">
+      <div class="md-fin-item">
+        <div class="md-fin-label">Acruamento de Juros</div>
+        <div class="md-fin-val" id="md-accrual">—</div>
+        <div class="md-fin-sub">juros corridos no mês</div>
+      </div>
+      <div class="md-fin-item">
+        <div class="md-fin-label">Marcação a Mercado</div>
+        <div class="md-fin-val" id="md-mtm">—</div>
+        <div class="md-fin-sub">variação de preço dos ativos</div>
+      </div>
+      <div class="md-fin-item total">
+        <div class="md-fin-label">Resultado Financeiro</div>
+        <div class="md-fin-val" id="md-resultado">—</div>
+        <div class="md-fin-sub" id="md-resultado-sub">acruamento + MtM</div>
+      </div>
+    </div>
+
     <div class="md-body">
       <div class="md-block">
         <div class="md-block-title">Alocação por produto</div>
@@ -1375,6 +1465,88 @@ const events = {
   10:['Cupom Treasury','Cupom GIS']
 };
 
+// Ano de cada mês (para filtro)
+const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025];
+
+// Dados do cabeçalho por ano
+const yearKPIs = {
+  all: {
+    patLabel:'Patrimônio Dez/2025', patValue:'$329.809', patSub:'Posição final do período',
+    maxValue:'$330.679', maxSub:'Novembro/2025',
+    apValue:'$69.590', apSub:'Fev + Mai + Set/2025', apClass:'up',
+    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set)', cupClass:'up',
+    jurValue:'$5.449', jurSub:'TDs 442/443/444/888 — 2025', jurClass:'up',
+    rentValue:'+7,37%', rentSub:'excluindo aportes externos', rentClass:'up',
+    yieldValue:'4,05%', yieldSub:'vs 4,55% em Dez/24 (–50bps)', yieldClass:'up',
+    heroRent:'+7,37%', heroRentColor:'var(--green)', heroSub:'excl. aportes externos',
+    heroGrowth:'+37,5% crescimento bruto', heroRange:'$239.882 → $329.809',
+    heroYear:'2024–2025', heroPeriod:'Dezembro 2024 → Dezembro 2025',
+  },
+  2025: {
+    patLabel:'Patrimônio Dez/2025', patValue:'$329.809', patSub:'Posição final 2025',
+    maxValue:'$330.679', maxSub:'Novembro/2025',
+    apValue:'$69.590', apSub:'Fev + Mai + Set/2025', apClass:'up',
+    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set)', cupClass:'up',
+    jurValue:'$5.449', jurSub:'TDs 442/443/444/888', jurClass:'up',
+    rentValue:'+7,37%', rentSub:'excluindo aportes externos', rentClass:'up',
+    yieldValue:'4,05%', yieldSub:'vs 4,55% em Dez/24 (–50bps)', yieldClass:'up',
+    heroRent:'+7,37%', heroRentColor:'var(--green)', heroSub:'excl. aportes externos',
+    heroGrowth:'+37,5% crescimento bruto', heroRange:'$239.882 → $329.809',
+    heroYear:'2025', heroPeriod:'Janeiro 2025 → Dezembro 2025',
+  },
+  2024: {
+    patLabel:'Patrimônio Dez/2024', patValue:'$239.882', patSub:'Posição inicial — base',
+    maxValue:'$239.882', maxSub:'Dezembro/2024',
+    apValue:'—', apSub:'Sem aportes identificados', apClass:'nu',
+    cupValue:'—', cupSub:'Período base', cupClass:'nu',
+    jurValue:'—', jurSub:'Período base', jurClass:'nu',
+    rentValue:'base', rentSub:'período de referência', rentClass:'nu',
+    yieldValue:'4,55%', yieldSub:'Posição em Dezembro/2024', yieldClass:'nu',
+    heroRent:'base', heroRentColor:'var(--muted)', heroSub:'período de referência',
+    heroGrowth:'Portfólio em Dez/2024', heroRange:'$239.882',
+    heroYear:'2024', heroPeriod:'Dezembro 2024',
+  }
+};
+
+function updateHeader(key) {
+  const d = yearKPIs[key] || yearKPIs.all;
+  document.getElementById('kpi-pat-label').textContent  = d.patLabel;
+  document.getElementById('kpi-pat-value').textContent  = d.patValue;
+  document.getElementById('kpi-pat-sub').textContent    = d.patSub;
+  document.getElementById('kpi-max-value').textContent  = d.maxValue;
+  document.getElementById('kpi-max-sub').textContent    = d.maxSub;
+  document.getElementById('kpi-ap-value').textContent   = d.apValue;
+  const apSub = document.getElementById('kpi-ap-sub');
+  apSub.textContent = d.apSub; apSub.className = 'kpi-delta ' + d.apClass;
+  document.getElementById('kpi-cup-value').textContent  = d.cupValue;
+  const cupSub = document.getElementById('kpi-cup-sub');
+  cupSub.textContent = d.cupSub; cupSub.className = 'kpi-delta ' + d.cupClass;
+  document.getElementById('kpi-jur-value').textContent  = d.jurValue;
+  const jurSub = document.getElementById('kpi-jur-sub');
+  jurSub.textContent = d.jurSub; jurSub.className = 'kpi-delta ' + d.jurClass;
+  document.getElementById('kpi-rent-value').textContent = d.rentValue;
+  const rentSub = document.getElementById('kpi-rent-sub');
+  rentSub.textContent = d.rentSub; rentSub.className = 'kpi-delta ' + d.rentClass;
+  document.getElementById('kpi-yield-value').textContent = d.yieldValue;
+  document.getElementById('kpi-yield-sub').textContent   = d.yieldSub;
+  // Hero stamp
+  const heroRent = document.getElementById('hero-rent-pct');
+  heroRent.textContent = d.heroRent; heroRent.style.color = d.heroRentColor;
+  document.getElementById('hero-rent-sub').textContent = d.heroSub;
+  document.getElementById('hero-growth').textContent   = d.heroGrowth;
+  document.getElementById('hero-range').textContent    = d.heroRange;
+  document.getElementById('hero-year-span').textContent   = d.heroYear;
+  document.getElementById('hero-period-strong').textContent = d.heroPeriod;
+}
+
+// Acruamento de juros mensal estimado (Treasury + TDs + GIS)
+// Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206
+const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194];
+
+// Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
+// Treasury face $144k, GIS face $50k (a partir de Mai/25), MF variação de NAV
+const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051];
+
 const gc = { grid:'rgba(255,255,255,0.08)', tick:'rgba(255,255,255,0.55)' };
 const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
 const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span class="dn">') + (v*100).toFixed(dec)+'%</span>';
@@ -1392,6 +1564,7 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
     const evArr = events[i] || [];
     const tr = document.createElement('tr');
     if(isLast) tr.className = 'highlighted';
+    tr.dataset.year = monthYear[i];
     
     const deltaStr = delta===null ? '<span class="muted2">base</span>' :
       (delta>=0?'<span class="up">+':'<span class="dn">')+
@@ -1459,6 +1632,7 @@ const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(
     const el = document.createElement('div');
     el.className = 'mni';
     el.dataset.idx = i;
+    el.dataset.year = monthYear[i];
     el.innerHTML = `
       <div class="mni-name">${m}</div>
       <div class="mni-total">$${(total[i]/1000).toFixed(0)}k</div>
@@ -1533,6 +1707,32 @@ window.showMonthDetail = function(i) {
       </div>`).join('') + '</div>';
   }
 
+  // Resultado Financeiro
+  const ac = accrual[i];
+  const mk = mtm[i];
+  const fmtMoney = v => v === null ? '—'
+    : (v >= 0 ? '+' : '') + '$' + Math.abs(v).toLocaleString('pt-BR', {maximumFractionDigits:0});
+  const colorClass = v => v === null ? 'color:var(--muted)' : v >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+
+  document.getElementById('md-accrual').innerHTML = ac === null
+    ? '<span style="color:var(--muted)">base</span>'
+    : `<span style="${colorClass(ac)}">${fmtMoney(ac)}</span>`;
+
+  document.getElementById('md-mtm').innerHTML = mk === null
+    ? '<span style="color:var(--muted)">base</span>'
+    : `<span style="${colorClass(mk)}">${fmtMoney(mk)}</span>`;
+
+  if (ac !== null && mk !== null) {
+    const res = ac + mk;
+    document.getElementById('md-resultado').innerHTML =
+      `<span style="${colorClass(res)}">${fmtMoney(res)}</span>`;
+    document.getElementById('md-resultado-sub').textContent =
+      res >= 0 ? 'resultado positivo no mês' : 'resultado negativo no mês';
+  } else {
+    document.getElementById('md-resultado').innerHTML = '<span style="color:var(--muted)">base</span>';
+    document.getElementById('md-resultado-sub').textContent = 'acruamento + MtM';
+  }
+
   // Show panel and scroll to it
   const panel = document.getElementById('month-detail');
   panel.classList.add('open');
@@ -1543,6 +1743,23 @@ window.closeMonthDetail = function() {
   selectedMonth = null;
   document.getElementById('month-detail').classList.remove('open');
   document.querySelectorAll('.mni').forEach(el => el.classList.remove('sel'));
+};
+
+// ── YEAR FILTER ──
+window.filterYear = function(y) {
+  closeMonthDetail();
+  document.querySelectorAll('.yr-btn').forEach(btn => {
+    btn.classList.toggle('active',
+      y === 'all' ? btn.textContent === 'Todos'
+                  : btn.textContent === String(y));
+  });
+  document.querySelectorAll('.mni').forEach(el => {
+    el.style.display = (y === 'all' || +el.dataset.year === y) ? '' : 'none';
+  });
+  document.querySelectorAll('#monthly-body tr').forEach(tr => {
+    tr.style.display = (y === 'all' || +tr.dataset.year === y) ? '' : 'none';
+  });
+  updateHeader(y);
 };
 
 // ── CHART DEFAULTS ──
@@ -1565,7 +1782,7 @@ new Chart(document.getElementById('rentChart'),{
     responsive:true, maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
         callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
     },
     scales:{
@@ -1593,7 +1810,7 @@ new Chart(document.getElementById('rentAcumChart'),{
     responsive:true, maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
         callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
     },
     scales:{
@@ -1617,7 +1834,7 @@ new Chart(document.getElementById('stackChart'),{
   },
   options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},
     scales:{
       x:{stacked:true,grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
       y:{stacked:true,grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
@@ -1661,7 +1878,7 @@ new Chart(document.getElementById('bondPriceChart'),{
   },
   options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
       y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]},min:97,max:105}
@@ -1683,7 +1900,7 @@ new Chart(document.getElementById('yieldChart'),{
     responsive:true,maintainAspectRatio:false,
     plugins:{
       legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
-      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(2)+'%'}}
+      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(2)+'%'}}
     },
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
@@ -1706,7 +1923,7 @@ new Chart(document.getElementById('bothPriceChart'),{
     responsive:true,maintainAspectRatio:false,
     plugins:{
       legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
-      tooltip:{backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(3)}}
+      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(3)}}
     },
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
