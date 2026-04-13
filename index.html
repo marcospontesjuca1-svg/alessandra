@@ -9,22 +9,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg: #1f3258;
-  --surface: #294068;
-  --surface2: #334f7e;
-  --border: rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --text: #eceae4;
-  --muted: #8c9aaa;
-  --muted2: #6a7a8a;
-  --accent: #c8a96e;
-  --accent2: #e8c98e;
-  --blue: #4a90d9;
-  --green: #4caf7d;
-  --red: #e05c5c;
-  --amber: #d4894a;
-  --purple: #8b7dd8;
-  --teal: #3db8a0;
+  --bg: #eef2f9;
+  --surface: #ffffff;
+  --surface2: #e4ebf7;
+  --border: rgba(20,50,120,0.10);
+  --border2: rgba(20,50,120,0.20);
+  --text: #1a2840;
+  --muted: #4a6080;
+  --muted2: #8aa0b8;
+  --accent: #9a7030;
+  --accent2: #b88c3a;
+  --blue: #2a78c8;
+  --green: #2e9a60;
+  --red: #d04040;
+  --amber: #c07030;
+  --purple: #6a5dc0;
+  --teal: #2a9e88;
   --font-display: 'Syne', sans-serif;
   --font-mono: 'DM Mono', monospace;
   --font-serif: 'Instrument Serif', serif;
@@ -79,7 +79,7 @@ body::before {
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -.02em;
-  color: #fff;
+  color: var(--text);
 }
 .hero-title span {
   font-family: var(--font-serif);
@@ -132,7 +132,7 @@ body::before {
   font-family: var(--font-display);
   font-size: 26px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text);
   letter-spacing: -.02em;
   line-height: 1;
 }
@@ -213,7 +213,7 @@ body::before {
   transition: background .15s;
 }
 .monthly-table td:first-child { text-align: left; color: var(--text); font-weight: 400; }
-.monthly-table tr:hover td { background: rgba(255,255,255,0.025); }
+.monthly-table tr:hover td { background: rgba(0,40,100,0.04); }
 .monthly-table tr:last-child td { border-bottom: none; }
 .monthly-table .highlighted { background: rgba(200, 169, 110, 0.06); }
 .monthly-table .highlighted td { border-bottom-color: rgba(200,169,110,0.15); }
@@ -244,7 +244,7 @@ body::before {
 .badge-amber { background: rgba(212,137,74,.15); color: var(--amber); border: 1px solid rgba(212,137,74,.25); }
 .badge-blue { background: rgba(74,144,217,.15); color: var(--blue); border: 1px solid rgba(74,144,217,.25); }
 .badge-purple { background: rgba(139,125,216,.15); color: var(--purple); border: 1px solid rgba(139,125,216,.25); }
-.badge-gray { background: rgba(255,255,255,.05); color: var(--muted); border: 1px solid var(--border2); }
+.badge-gray { background: rgba(0,40,100,.06); color: var(--muted); border: 1px solid var(--border2); }
 
 /* ── ASSET TABLE ── */
 .asset-table { width: 100%; border-collapse: collapse; }
@@ -257,7 +257,7 @@ body::before {
 .asset-table td { padding: 10px 10px; text-align: right; border-bottom: 1px solid var(--border); font-size: 12px; }
 .asset-table td:first-child { text-align: left; }
 .asset-table tr:last-child td { border-bottom: none; }
-.asset-table tr:hover td { background: rgba(255,255,255,.025); }
+.asset-table tr:hover td { background: rgba(0,40,100,.04); }
 .asset-name { font-size: 12px; color: var(--text); display: block; }
 .asset-sub { font-size: 10px; color: var(--muted2); display: block; margin-top: 1px; font-family: var(--font-mono); }
 
@@ -282,7 +282,7 @@ body::before {
 .analysis-card.neutral::before { background: var(--blue); }
 .analysis-card.risk::before { background: var(--purple); }
 .analysis-tag { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: .6rem; }
-.analysis-headline { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: #fff; margin-bottom: .5rem; line-height: 1.2; }
+.analysis-headline { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: .5rem; line-height: 1.2; }
 .analysis-body { font-size: 11.5px; color: var(--muted); line-height: 1.65; }
 .analysis-body strong { color: var(--text); font-weight: 400; }
 
@@ -347,7 +347,7 @@ body::before {
 .kpi:nth-child(7) { border-bottom-color: rgba(74,144,217,.3); }
 
 .card { transition: border-color .2s, box-shadow .2s; }
-.card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.card:hover { border-color: var(--border2); box-shadow: 0 6px 24px rgba(0,0,0,.10); }
 
 .section-header { padding-bottom: .25rem; }
 
@@ -381,11 +381,11 @@ body::before {
   overflow-x: auto;
   padding-bottom: 6px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,.1) transparent;
+  scrollbar-color: rgba(0,40,100,.2) transparent;
 }
 .month-nav::-webkit-scrollbar { height: 4px; }
 .month-nav::-webkit-scrollbar-track { background: transparent; }
-.month-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.month-nav::-webkit-scrollbar-thumb { background: rgba(0,40,100,.2); border-radius: 2px; }
 .mni {
   flex-shrink: 0;
   min-width: 80px;
@@ -397,10 +397,10 @@ body::before {
   transition: background .15s, border-color .2s, transform .15s, box-shadow .15s;
   text-align: center;
 }
-.mni:hover { background: var(--surface2); border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.mni:hover { background: var(--surface2); border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
 .mni.sel { border-color: var(--accent); background: rgba(200,169,110,.09); box-shadow: 0 0 0 1px rgba(200,169,110,.2); }
 .mni-name { font-size: 9px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: .3rem; }
-.mni-total { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; letter-spacing: -.01em; }
+.mni-total { font-family: var(--font-display); font-size: 11px; font-weight: 700; color: var(--text); white-space: nowrap; letter-spacing: -.01em; }
 .mni-rent { font-size: 9px; margin-top: .25rem; min-height: 1em; }
 .mni-bar { height: 3px; background: var(--border2); border-radius: 2px; margin-top: .45rem; overflow: hidden; }
 .mni-bar-fill { height: 100%; border-radius: 2px; }
@@ -433,7 +433,7 @@ body::before {
 }
 .md-title-wrap {}
 .md-label { font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem; }
-.md-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -.02em; }
+.md-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.02em; }
 .md-close { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); font-size: 16px; cursor: pointer; padding: .3rem .6rem; border-radius: 6px; line-height: 1; transition: color .2s, border-color .2s; }
 .md-close:hover { color: var(--text); border-color: var(--accent); }
 .md-kpis {
@@ -448,7 +448,7 @@ body::before {
 }
 .md-kpi { background: var(--surface2); padding: .85rem 1rem; }
 .md-kpi-label { font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
-.md-kpi-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -.02em; line-height: 1.1; }
+.md-kpi-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.02em; line-height: 1.1; }
 .md-kpi-sub { font-size: 10px; color: var(--muted); margin-top: .25rem; }
 .md-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .md-block { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
@@ -462,7 +462,7 @@ body::before {
 .md-alloc-bar { height: 2px; background: var(--border2); border-radius: 1px; overflow: hidden; margin-top: .15rem; }
 .md-alloc-bar-fill { height: 100%; border-radius: 1px; }
 .md-events-list { display: flex; flex-direction: column; gap: .5rem; }
-.md-event-row { display: flex; align-items: flex-start; gap: .6rem; font-size: 11px; padding: .4rem .6rem; background: rgba(255,255,255,.025); border-radius: 6px; }
+.md-event-row { display: flex; align-items: flex-start; gap: .6rem; font-size: 11px; padding: .4rem .6rem; background: rgba(0,40,100,.04); border-radius: 6px; }
 .md-event-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: .3rem; }
 .md-no-events { font-size: 11px; color: var(--muted2); font-style: italic; }
 
@@ -929,6 +929,7 @@ body::before {
       <button class="yr-btn active" onclick="filterYear('all')">Todos</button>
       <button class="yr-btn" onclick="filterYear(2024)">2024</button>
       <button class="yr-btn" onclick="filterYear(2025)">2025</button>
+      <button class="yr-btn" onclick="filterYear(2026)">2026</button>
     </div>
     <div class="month-nav" id="month-nav"></div>
   </div>
@@ -1260,118 +1261,139 @@ body::before {
         <thead><tr>
           <th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor (USD)</th><th>Saldo após</th>
         </tr></thead>
-        <tbody>
-          <tr>
+        <tbody id="cashflow-body">
+          <tr data-year="2024">
             <td><span class="asset-sub">Dez/2024</span></td>
             <td><span class="badge badge-gray">Custódia</span></td>
             <td><span class="asset-sub">Custody Fee Q4-2024</span></td>
             <td class="dn">–$37,63</td>
             <td class="num">$239.882</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Fev/2025</span></td>
             <td><span class="badge badge-green">Aporte</span></td>
             <td><span class="asset-sub">2× transferências Alessandra Sales Rolim Bertoni</span></td>
             <td class="up">+$10.000</td>
             <td class="num">$255.266</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Mar/2025</span></td>
             <td><span class="badge badge-amber">Investimento</span></td>
             <td><span class="asset-sub">Abertura TD 210015888 — 4,70% a.a., 720 dias, venc. 24/02/2027</span></td>
             <td class="dn">–$14.000</td>
             <td class="num">$256.836</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Mar/2025</span></td>
             <td><span class="badge badge-gray">Custódia</span></td>
             <td><span class="asset-sub">Custody Fee Q1-2025 — $35,25</span></td>
             <td class="dn">–$35,25</td>
             <td class="num">$256.836</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Mai/2025</span></td>
             <td><span class="badge badge-green">Aporte</span></td>
             <td><span class="asset-sub">Transferência Alessandra S.R. Bertoni</span></td>
             <td class="up">+$48.090</td>
             <td class="num">—</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Mai/2025</span></td>
             <td><span class="badge badge-blue">Cupom</span></td>
             <td><span class="asset-sub">Pagamento semestral US Treasury T 4⅜ — referente Nov/24–Mai/25</span></td>
             <td class="up">+$3.150</td>
             <td class="num">—</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Mai/2025</span></td>
             <td><span class="badge badge-amber">Compra</span></td>
             <td><span class="asset-sub">Compra $50k General Mills GIS 4.95 — preço 97,749 + comissão $250</span></td>
             <td class="dn">–$49.475</td>
             <td class="num">$305.273</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Jun/2025</span></td>
             <td><span class="badge badge-blue">Juros TDs</span></td>
             <td><span class="asset-sub">Pagamento anual TDs 442/443/444 — juros acumulados 12 meses</span></td>
             <td class="up">+$4.901</td>
             <td class="num">—</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Jun/2025</span></td>
             <td><span class="badge badge-gray">Custódia</span></td>
             <td><span class="asset-sub">Custody Fee Q2-2025 — $42,09</span></td>
             <td class="dn">–$42,09</td>
             <td class="num">$308.526</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Jul/2025</span></td>
             <td><span class="badge badge-purple">Fundo</span></td>
             <td><span class="asset-sub">Compra 59,672 cotas Bradesco Int. Conservative R — NAV $117,307</span></td>
             <td class="dn">–$6.999,95</td>
             <td class="num">$308.700</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Set/2025</span></td>
             <td><span class="badge badge-green">Aporte</span></td>
             <td><span class="asset-sub">Transferências Alessandra S.R. Bertoni + depósito</span></td>
             <td class="up">+$11.500</td>
             <td class="num">—</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Set/2025</span></td>
             <td><span class="badge badge-blue">Cupom</span></td>
             <td><span class="asset-sub">Cupom semestral General Mills GIS 4.95 — $1.237,50</span></td>
             <td class="up">+$1.237,50</td>
             <td class="num">—</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Set/2025</span></td>
             <td><span class="badge badge-gray">Custódia</span></td>
             <td><span class="asset-sub">Custody Fee Q3-2025 — $50,56</span></td>
             <td class="dn">–$50,56</td>
             <td class="num">$326.090</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Out/2025</span></td>
             <td><span class="badge badge-purple">Fundo</span></td>
             <td><span class="asset-sub">Compra 99,603 cotas adicionais Bradesco Int. Conservative R</span></td>
             <td class="dn">–$11.999,96</td>
             <td class="num">$327.894</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Nov/2025</span></td>
             <td><span class="badge badge-blue">Cupom</span></td>
             <td><span class="asset-sub">Cupom semestral US Treasury T 4⅜ — referente Mai–Nov/2025</span></td>
             <td class="up">+$3.150</td>
             <td class="num">$330.679</td>
           </tr>
-          <tr>
+          <tr data-year="2025">
             <td><span class="asset-sub">Dez/2025</span></td>
             <td><span class="badge badge-gray">Custódia</span></td>
             <td><span class="asset-sub">Custody Fee Q4-2025 — $50,73</span></td>
             <td class="dn">–$50,73</td>
             <td class="num">$329.809</td>
+          </tr>
+          <tr data-year="2026">
+            <td><span class="asset-sub">Jan/2026</span></td>
+            <td><span class="badge badge-green">Aporte</span></td>
+            <td><span class="asset-sub">Transferência Alessandra S.R. Bertoni</span></td>
+            <td class="up">+$200.000</td>
+            <td class="num">—</td>
+          </tr>
+          <tr data-year="2026">
+            <td><span class="asset-sub">Jan/2026</span></td>
+            <td><span class="badge badge-red">Saída</span></td>
+            <td><span class="asset-sub">Pagamento Rybovich Marina (external outflow)</span></td>
+            <td class="dn">–$30.320</td>
+            <td class="num">$500.262</td>
+          </tr>
+          <tr data-year="2026">
+            <td><span class="asset-sub">Mar/2026</span></td>
+            <td><span class="badge badge-red">Saída</span></td>
+            <td><span class="asset-sub">Pagamento RYBO PROPERTY (external outflow)</span></td>
+            <td class="dn">–$17.708</td>
+            <td class="num">$475.120</td>
           </tr>
         </tbody>
       </table>
@@ -1388,8 +1410,8 @@ body::before {
     <div class="analysis-grid">
       <div class="analysis-card positive">
         <div class="analysis-tag">Performance</div>
-        <div class="analysis-headline">Crescimento robusto de 37,5% no período</div>
-        <div class="analysis-body">O patrimônio cresceu de <strong>$239.882</strong> para <strong>$329.809</strong> entre Dez/24 e Dez/25. Grande parte do crescimento (≈$70k) é explicada pelos aportes realizados em Fev, Mai e Set/2025. O ganho de mercado líquido estimado foi de <strong>≈$20k</strong>, vindo principalmente da valorização dos bonds com a queda dos yields.</div>
+        <div class="analysis-headline">Patrimônio de $475k em Mar/26 — crescimento expressivo</div>
+        <div class="analysis-body">O patrimônio cresceu de <strong>$239.882</strong> (Dez/24) para <strong>$475.120</strong> (Mar/26). Em 2025, o retorno líquido de aportes foi de <strong>+7,37%</strong>. Em 2026 (Jan–Mar), o YTD é de <strong>–1,27%</strong>, impactado pela queda de MtM dos bonds e do fundo em março. O aporte de <strong>$200k</strong> em Jan/26 mais que dobrou o patrimônio nominalmente.</div>
       </div>
       <div class="analysis-card positive">
         <div class="analysis-tag">Bonds · 60% do portfólio</div>
@@ -1421,32 +1443,35 @@ body::before {
 
   <footer class="footer">
     <span>Portfólio 1120450 · Banco Bradesco Europa S.A. · Luxemburgo · CSSF B-18996</span>
-    <span>Gerado em Janeiro 2026 · Dados: Extratos mensais Dez/24–Dez/25 · USD</span>
+    <span>Gerado em Abril 2026 · Dados: Extratos mensais Dez/24–Mar/26 · USD</span>
   </footer>
 
 </div><!-- /page -->
 
 <script>
 // ── DATA ──
-const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25'];
-const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809];
-const bonds  = [142821,143810,147402,148538,149476,194269,197101,196775,200029,200394,201646,200775,199331];
-const tds    = [92543, 92965, 93346,107815,108278,108756,104317,104796,105274,105737,106215,106678,107156];
-const mf     = [0,0,0,0,0,0,0,7023,7099,7165,19239,19282,19428];
-const cash   = [4518,4518,14518,483,483,2248,7107,107,107,12794,794,3944,3893];
-const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05];
-const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69];
-const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188];
-const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496];
+const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25','Jan/26','Fev/26','Mar/26'];
+const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809,500262,502720,475120];
+const bonds  = [142821,143810,147402,148538,149476,194269,197101,196775,200029,200394,201646,200775,199331,199557,203483,197953];
+const tds    = [92543, 92965, 93346,107815,108278,108756,104317,104796,105274,105737,106215,106678,107156, 93028, 93408, 93830];
+const mf     = [0,0,0,0,0,0,0,7023,7099,7165,19239,19282,19428,7521,202772,178800];
+const cash   = [4518,4518,14518,483,483,2248,7107,107,107,12794,794,3944,3893,200156,3056,4536];
+const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05,4.10,3.82,4.16];
+const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69,4.72,4.57,5.09];
+const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188,101.883,103.836,101.383];
+const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496,101.334,102.188,99.163];
 const bondsPct = bonds.map((b,i) => total[i]>0 ? +(b/total[i]*100).toFixed(1) : 0);
 
 // Aportes externos (transferências bancárias entradas)
-const aportes = [0, 0, 10000, 0, 0, 48090, 0, 0, 0, 11500, 0, 0, 0];
+const aportes = [0, 0, 10000, 0, 0, 48090, 0, 0, 0, 11500, 0, 0, 0, 200000, 0, 0];
 
-// Rentabilidade mensal real = (Total[i] - Aporte[i]) / Total[i-1] - 1
+// Saídas externas (pagamentos a terceiros que reduzem patrimônio mas não são perda de investimento)
+const saidas  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30320, 0, 17708];
+
+// Rentabilidade mensal real = (Total[i] - Aporte[i] + Saida[i]) / Total[i-1] - 1
 const rentMes = months.map((m,i) => {
   if(i===0) return null;
-  return (total[i] - aportes[i]) / total[i-1] - 1;
+  return (total[i] - aportes[i] + saidas[i]) / total[i-1] - 1;
 });
 
 // Rentabilidade acumulada encadeada
@@ -1462,25 +1487,26 @@ const rentAcum = (() => {
 const events = {
   1:['Aportes $10k'], 2:['Novo TD 4,70%'], 4:['Aporte $48k','Compra GIS'],
   5:['Juros TDs'], 6:['Compra Fundo'], 8:['Aportes $11,5k'], 9:['Amp. Fundo'],
-  10:['Cupom Treasury','Cupom GIS']
+  10:['Cupom Treasury','Cupom GIS'],
+  13:['Aporte $200k','Saída $30,3k'], 15:['Saída $17,7k']
 };
 
 // Ano de cada mês (para filtro)
-const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025];
+const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2026,2026,2026];
 
 // Dados do cabeçalho por ano
 const yearKPIs = {
   all: {
-    patLabel:'Patrimônio Dez/2025', patValue:'$329.809', patSub:'Posição final do período',
-    maxValue:'$330.679', maxSub:'Novembro/2025',
-    apValue:'$69.590', apSub:'Fev + Mai + Set/2025', apClass:'up',
-    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set)', cupClass:'up',
-    jurValue:'$5.449', jurSub:'TDs 442/443/444/888 — 2025', jurClass:'up',
-    rentValue:'+7,37%', rentSub:'excluindo aportes externos', rentClass:'up',
-    yieldValue:'4,05%', yieldSub:'vs 4,55% em Dez/24 (–50bps)', yieldClass:'up',
-    heroRent:'+7,37%', heroRentColor:'var(--green)', heroSub:'excl. aportes externos',
-    heroGrowth:'+37,5% crescimento bruto', heroRange:'$239.882 → $329.809',
-    heroYear:'2024–2025', heroPeriod:'Dezembro 2024 → Dezembro 2025',
+    patLabel:'Patrimônio Mar/2026', patValue:'$475.120', patSub:'Posição mais recente',
+    maxValue:'$502.720', maxSub:'Fevereiro/2026',
+    apValue:'$269.590', apSub:'2025: Fev+Mai+Set · 2026: Jan', apClass:'up',
+    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set) — 2025', cupClass:'up',
+    jurValue:'$8.921', jurSub:'TDs — 2025 + Jan–Mar/2026', jurClass:'up',
+    rentValue:'+6,09%', rentSub:'excluindo aportes e saídas externas', rentClass:'up',
+    yieldValue:'4,16%', yieldSub:'vs 4,55% em Dez/24 (–39bps)', yieldClass:'up',
+    heroRent:'+6,09%', heroRentColor:'var(--green)', heroSub:'excl. aportes e saídas externas',
+    heroGrowth:'+97,9% crescimento bruto de patrimônio', heroRange:'$239.882 → $475.120',
+    heroYear:'2024–2026', heroPeriod:'Dezembro 2024 → Março 2026',
   },
   2025: {
     patLabel:'Patrimônio Dez/2025', patValue:'$329.809', patSub:'Posição final 2025',
@@ -1505,6 +1531,18 @@ const yearKPIs = {
     heroRent:'base', heroRentColor:'var(--muted)', heroSub:'período de referência',
     heroGrowth:'Portfólio em Dez/2024', heroRange:'$239.882',
     heroYear:'2024', heroPeriod:'Dezembro 2024',
+  },
+  2026: {
+    patLabel:'Patrimônio Mar/2026', patValue:'$475.120', patSub:'Posição final Mar/2026',
+    maxValue:'$502.720', maxSub:'Fevereiro/2026',
+    apValue:'$200.000', apSub:'Janeiro/2026', apClass:'up',
+    cupValue:'—', cupSub:'Nenhum cupom em Jan–Mar/2026', cupClass:'nu',
+    jurValue:'$3.472', jurSub:'TDs — Jan–Mar/2026', jurClass:'up',
+    rentValue:'–1,27%', rentSub:'excluindo aportes e saídas externas', rentClass:'dn',
+    yieldValue:'4,16%', yieldSub:'vs 4,05% em Dez/25 (+11bps)', yieldClass:'nu',
+    heroRent:'–1,27%', heroRentColor:'var(--red)', heroSub:'excl. aportes e saídas externas',
+    heroGrowth:'YTD 2026: –1,27% (impacto MtM)', heroRange:'$329.809 → $475.120',
+    heroYear:'2026', heroPeriod:'Janeiro 2026 → Março 2026',
   }
 };
 
@@ -1541,13 +1579,13 @@ function updateHeader(key) {
 
 // Acruamento de juros mensal estimado (Treasury + TDs + GIS)
 // Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206
-const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194];
+const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139];
 
 // Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
 // Treasury face $144k, GIS face $50k (a partir de Mai/25), MF variação de NAV
-const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051];
+const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017];
 
-const gc = { grid:'rgba(255,255,255,0.08)', tick:'rgba(255,255,255,0.55)' };
+const gc = { grid:'rgba(0,40,100,0.10)', tick:'rgba(20,50,100,0.65)' };
 const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
 const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span class="dn">') + (v*100).toFixed(dec)+'%</span>';
 
@@ -1571,9 +1609,10 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
       '$'+Math.abs(delta).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</span>';
     const barW = Math.round((total[i]/maxVal)*56);
     const barColor = rent===null?'#4a90d9':rent>=0?'#4caf7d':'#e05c5c';
-    const aporteStr = aportes[i]>0
-      ? '<span class="badge badge-green">+$'+aportes[i].toLocaleString('pt-BR')+'</span>'
-      : '<span class="muted2">—</span>';
+    let aporteStr = '';
+    if (aportes[i]>0) aporteStr += '<span class="badge badge-green">+$'+aportes[i].toLocaleString('pt-BR')+'</span>';
+    if (saidas[i]>0) aporteStr += (aporteStr?' ':'')+'<span class="badge badge-red">−$'+saidas[i].toLocaleString('pt-BR')+'</span>';
+    if (!aporteStr) aporteStr = '<span class="muted2">—</span>';
 
     // Highlight row based on rent
     if(rent!==null && rent<0) tr.style.background='rgba(224,92,92,0.04)';
@@ -1601,7 +1640,8 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
 const monthFull = [
   'Dezembro 2024','Janeiro 2025','Fevereiro 2025','Março 2025','Abril 2025',
   'Maio 2025','Junho 2025','Julho 2025','Agosto 2025','Setembro 2025',
-  'Outubro 2025','Novembro 2025','Dezembro 2025'
+  'Outubro 2025','Novembro 2025','Dezembro 2025',
+  'Janeiro 2026','Fevereiro 2026','Março 2026'
 ];
 const allEvents = {
   2:  [{icon:'💵', text:'Aporte externo de $10.000', type:'aporte'}],
@@ -1614,9 +1654,12 @@ const allEvents = {
   9:  [{icon:'💵', text:'Aporte externo de $11.500', type:'aporte'},
        {icon:'💰', text:'Cupom semestral General Mills GIS — $1.237,50', type:'cupom'}],
   10: [{icon:'📊', text:'Compra adicional 99,603 cotas Bradesco Int. Conservative R', type:'invest'}],
-  11: [{icon:'💰', text:'Cupom semestral US Treasury T 4⅜ — $3.150', type:'cupom'}]
+  11: [{icon:'💰', text:'Cupom semestral US Treasury T 4⅜ — $3.150', type:'cupom'}],
+  13: [{icon:'💵', text:'Aporte externo de $200.000', type:'aporte'},
+       {icon:'🏠', text:'Pagamento Rybovich Marina — $30.320 (saída externa)', type:'saida'}],
+  15: [{icon:'🏠', text:'Pagamento RYBO PROPERTY — $17.708 (saída externa)', type:'saida'}]
 };
-const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(--blue)', cupom:'var(--accent)' };
+const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(--blue)', cupom:'var(--accent)', saida:'var(--red)' };
 
 (function buildMonthNav() {
   const nav = document.getElementById('month-nav');
@@ -1668,12 +1711,18 @@ window.showMonthDetail = function(i) {
   const ra = rentAcum[i];
   document.getElementById('md-acum').innerHTML = ra === null ? '' : `Acum: <span style="color:${ra>=0?'var(--green)':'var(--red)'}">${ra>=0?'+':''}${(ra*100).toFixed(2)}%</span>`;
 
-  // KPI 3 — Aporte
+  // KPI 3 — Aporte / Saída
   const ap = aportes[i];
-  document.getElementById('md-aporte').innerHTML = ap > 0
-    ? `<span class="up">+$${ap.toLocaleString('pt-BR')}</span>`
-    : '<span style="color:var(--muted2)">—</span>';
-  document.getElementById('md-aporte-sub').textContent = ap > 0 ? 'Transferência externa' : 'Sem aportes';
+  const sa = saidas[i];
+  let aporteHtml = '';
+  if (ap > 0) aporteHtml += `<span class="up">+$${ap.toLocaleString('pt-BR')}</span>`;
+  if (sa > 0) aporteHtml += (ap > 0 ? ' ' : '') + `<span class="dn">−$${sa.toLocaleString('pt-BR')}</span>`;
+  if (!aporteHtml) aporteHtml = '<span style="color:var(--muted2)">—</span>';
+  document.getElementById('md-aporte').innerHTML = aporteHtml;
+  document.getElementById('md-aporte-sub').textContent =
+    ap > 0 && sa > 0 ? 'Aporte + saída externa' :
+    ap > 0 ? 'Transferência externa' :
+    sa > 0 ? 'Saída externa (não perda)' : 'Sem movimentos externos';
 
   // KPI 4 — Top asset
   const assets = [{n:'Bonds',v:bonds[i],c:'#4a90d9'},{n:'TDs',v:tds[i],c:'#d4894a'},{n:'Funds',v:mf[i],c:'#8b7dd8'},{n:'Cash',v:cash[i],c:'#5a5856'}];
@@ -1759,6 +1808,10 @@ window.filterYear = function(y) {
   document.querySelectorAll('#monthly-body tr').forEach(tr => {
     tr.style.display = (y === 'all' || +tr.dataset.year === y) ? '' : 'none';
   });
+  // Filtrar tabela de fluxo de caixa
+  document.querySelectorAll('#cashflow-body tr').forEach(tr => {
+    tr.style.display = (y === 'all' || +tr.dataset.year === y) ? '' : 'none';
+  });
   updateHeader(y);
 };
 
@@ -1782,7 +1835,7 @@ new Chart(document.getElementById('rentChart'),{
     responsive:true, maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+      tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1,
         callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
     },
     scales:{
@@ -1810,7 +1863,7 @@ new Chart(document.getElementById('rentAcumChart'),{
     responsive:true, maintainAspectRatio:false,
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,
+      tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1,
         callbacks:{label:ctx=>{const v=ctx.raw;return (v>=0?'+':'')+v.toFixed(4)+'%'}}}
     },
     scales:{
@@ -1834,7 +1887,7 @@ new Chart(document.getElementById('stackChart'),{
   },
   options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1,callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},
     scales:{
       x:{stacked:true,grid:{display:false},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
       y:{stacked:true,grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:10},callback:v=>fmt(v)},border:{dash:[3,3]}}
@@ -1878,7 +1931,7 @@ new Chart(document.getElementById('bondPriceChart'),{
   },
   options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1}},
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
       y:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]},min:97,max:105}
@@ -1899,8 +1952,8 @@ new Chart(document.getElementById('yieldChart'),{
   options:{
     responsive:true,maintainAspectRatio:false,
     plugins:{
-      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
-      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(2)+'%'}}
+      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(20,50,100,0.6)',font:{size:10}}},
+      tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(2)+'%'}}
     },
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
@@ -1922,8 +1975,8 @@ new Chart(document.getElementById('bothPriceChart'),{
   options:{
     responsive:true,maintainAspectRatio:false,
     plugins:{
-      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(255,255,255,0.5)',font:{size:10}}},
-      tooltip:{backgroundColor:'#222d45',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(3)}}
+      legend:{display:true,position:'top',labels:{boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rect',padding:12,color:'rgba(20,50,100,0.6)',font:{size:10}}},
+      tooltip:{backgroundColor:'#ffffff',titleColor:'#1a2840',bodyColor:'#4a6080',borderColor:'rgba(0,40,100,0.15)',borderWidth:1,callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.raw?.toFixed(3)}}
     },
     scales:{
       x:{grid:{color:gc.grid},ticks:{color:gc.tick,font:{size:9}},border:{dash:[3,3]}},
