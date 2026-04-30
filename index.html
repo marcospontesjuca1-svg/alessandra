@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root {
   --bg: #eef2f9;
@@ -904,11 +905,14 @@ body::before {
     <div class="cfg-section">
       <div class="cfg-section-label">Importar Novo Mês</div>
       <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
-        Adicione os dados do mês seguinte. A página recarrega com os novos dados incorporados — salve o backup em seguida.
+        Importe o PDF do extrato mensal do Bradesco Europa — os dados são extraídos automaticamente.
       </p>
       <div class="cfg-row">
-        <button class="cfg-action primary" onclick="closeCfg();openImport()">+ Importar Mês</button>
+        <button class="cfg-action primary" onclick="document.getElementById('cfg-pdf').click()">📄 Importar PDF</button>
+        <button class="cfg-action" onclick="closeCfg();openImport()">✎ Manual</button>
       </div>
+      <input type="file" id="cfg-pdf" accept=".pdf" style="display:none" onchange="closeCfg();importPDF(this)" />
+      <div class="cfg-msg" id="cfg-pdf-msg"></div>
     </div>
   </div>
 </div>
@@ -2308,38 +2312,190 @@ function showTab(t) {
     'Setembro':'Outubro','Outubro':'Novembro','Novembro':'Dezembro','Dezembro':'Janeiro'
   };
 
-  window.openImport = function() {
-    const lastLabel = months[months.length - 1];
-    const lastFull  = monthFull[months.length - 1];
-    const mLabel = lastLabel.match(/^([A-Za-zçÇ]+)\/(\d{2})$/);
-    if (mLabel) {
-      const nm = IMP_MONTHS_PT[mLabel[1]] || '';
-      const ny = nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2];
-      document.getElementById('imp-label').value = nm + '/' + ny;
-      document.getElementById('imp-year').value = '20' + (nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2]);
+  // ── PDF Parser ──
+  function parseBradescoStatement(rawText) {
+    const t = rawText.replace(/\s+/g, ' ').trim();
+    const parseNum = s => parseFloat((s || '0').replace(/,/g, ''));
+
+    // Period end date → month label
+    const periodM = t.match(/Period:\s+\d{2}\/\d{2}\/\d{2}\s+to\s+\d{2}\/(\d{2})\/(\d{2})/i);
+    let label = '', fullName = '', year = 0;
+    if (periodM) {
+      const mm = periodM[1], yy = periodM[2];
+      const mMap = {
+        '01':['Jan','Janeiro'],'02':['Fev','Fevereiro'],'03':['Mar','Março'],
+        '04':['Abr','Abril'],'05':['Mai','Maio'],'06':['Jun','Junho'],
+        '07':['Jul','Julho'],'08':['Ago','Agosto'],'09':['Set','Setembro'],
+        '10':['Out','Outubro'],'11':['Nov','Novembro'],'12':['Dez','Dezembro']
+      };
+      const [lbl, full] = mMap[mm] || ['',''];
+      year = 2000 + parseInt(yy);
+      label = lbl + '/' + yy;
+      fullName = full + ' ' + year;
     }
-    const mFull = lastFull ? lastFull.match(/^(\w+) (\d{4})$/) : null;
-    if (mFull) {
-      const nm = IMP_FULL_PT[mFull[1]] || '';
-      const ny = nm === 'Janeiro' ? String(parseInt(mFull[2]) + 1) : mFull[2];
-      document.getElementById('imp-fullname').value = nm + ' ' + ny;
+
+    // Consolidated totals
+    const totalV  = parseNum(t.match(/Net Position in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+    const cashV   = parseNum(t.match(/Total CASH ACCOUNT in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+    const tdsV    = parseNum(t.match(/Total TIME DEPOSIT in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+    const bondsV  = parseNum(t.match(/Total BONDS in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+    const mfV     = parseNum(t.match(/Total MUTUAL FUNDS in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+
+    // Bond prices and yields (GIS before Treasury in document)
+    const gisBlock   = t.match(/GENERAL MILLS.*?(?=US TREASURY|MUTUAL FUNDS)/)?.[0] || '';
+    const treasBlock = t.match(/US TREASURY.*?(?=GENERAL MILLS|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    const pGMV    = gisBlock   ? parseFloat(gisBlock.match(/Market Price:\s*([\d.]+)/)?.[1]   || 0) || null : null;
+    const yGMV    = gisBlock   ? parseFloat(gisBlock.match(/Market Yield:\s*([\d.]+)/)?.[1]   || 0) || null : null;
+    const pTreasV = treasBlock ? parseFloat(treasBlock.match(/Market Price:\s*([\d.]+)/)?.[1] || 0) || null : null;
+    const yTreasV = treasBlock ? parseFloat(treasBlock.match(/Market Yield:\s*([\d.]+)/)?.[1] || 0) || null : null;
+
+    // External payments (saidas): EXT PMT debits
+    let saidasV = 0;
+    for (const m of t.matchAll(/EXT PMT[^D]{0,60}Debit:\s*([\d,]+\.?\d*)/g))
+      saidasV += parseNum(m[1]);
+    saidasV = Math.round(saidasV);
+
+    // Fund redemptions (SALE credits from BRADESCO INT C)
+    let fundRedemptions = 0;
+    for (const m of t.matchAll(/SALE[^C]{0,40}BRADESCO INT C[^C]{0,40}Credit:\s*([\d,]+\.?\d*)/g))
+      fundRedemptions += parseNum(m[1]);
+
+    // Accrual: TDs (principal × rate / 12) + bonds (face × coupon / 12)
+    let accrualV = 0;
+    const tdSections = t.split(/TIME DEPOSIT — Account:/);
+    tdSections.shift();
+    for (const s of tdSections) {
+      const p = parseNum(s.match(/Principal Amount:\s*([\d,]+\.?\d*)/)?.[1]);
+      const r = parseFloat(s.match(/Interest Rate:\s*([\d.]+)/)?.[1] || 0);
+      if (p && r) accrualV += p * r / 100 / 12;
     }
-    const li = months.length - 1;
-    if (accrual[li]) document.getElementById('imp-accrual').value = accrual[li];
-    if (yTreas[li])  document.getElementById('imp-ytreas').value  = yTreas[li];
-    if (pTreas[li])  document.getElementById('imp-ptreas').value  = pTreas[li];
-    if (yGM[li])     document.getElementById('imp-ygm').value     = yGM[li];
-    if (pGM[li])     document.getElementById('imp-pgm').value     = pGM[li];
+    for (const s of [gisBlock, treasBlock]) {
+      const f = parseNum(s.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]);
+      const c = parseFloat(s.match(/Coupon:\s*([\d.]+)/)?.[1] || 0);
+      if (f && c) accrualV += f * c / 100 / 12;
+    }
+    accrualV = Math.round(accrualV);
+
+    // MtM: bond price change × face value + MF NAV change
+    let mtmV = 0;
+    if (pTreasV && pTreas.length) {
+      const prevPT = pTreas[pTreas.length - 1];
+      const faceT  = parseNum(treasBlock.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]) || 144000;
+      mtmV += (pTreasV - prevPT) / 100 * faceT;
+    }
+    if (pGMV && pGM.length) {
+      const prevPG = pGM[pGM.length - 1];
+      const faceG  = parseNum(gisBlock.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]) || 50000;
+      mtmV += (pGMV - prevPG) / 100 * faceG;
+    }
+    // MF MtM: current value − (prev value − redemptions)
+    const prevMF = mf[mf.length - 1] || 0;
+    if (mfV && prevMF) mtmV += mfV - (prevMF - fundRedemptions);
+    mtmV = Math.round(mtmV);
+
+    return { label, fullName, year, total: totalV, bonds: bondsV, tds: tdsV,
+             mf: mfV, cash: cashV, pTreas: pTreasV, yTreas: yTreasV,
+             pGM: pGMV, yGM: yGMV, saidas: saidasV, aportes: 0,
+             accrual: accrualV, mtm: mtmV };
+  }
+
+  window.importPDF = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const msgEl = document.getElementById('cfg-pdf-msg');
+    msgEl.textContent = 'Lendo PDF...';
+    msgEl.className = 'cfg-msg ok';
+
+    if (typeof pdfjsLib === 'undefined') {
+      msgEl.textContent = 'Biblioteca PDF não carregada. Verifique a conexão.';
+      msgEl.className = 'cfg-msg err';
+      return;
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          fullText += content.items.map(item => item.str).join(' ') + '\n';
+        }
+        const data = parseBradescoStatement(fullText);
+        if (!data.label || !data.total) {
+          msgEl.textContent = 'Não foi possível identificar o extrato. Verifique se é um extrato Bradesco Europa.';
+          msgEl.className = 'cfg-msg err';
+          return;
+        }
+        openImport(data);
+        input.value = '';
+      } catch (err) {
+        msgEl.textContent = 'Erro ao ler o PDF: ' + err.message;
+        msgEl.className = 'cfg-msg err';
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  window.openImport = function(data) {
+    // Clear all fields first
+    ['imp-label','imp-fullname','imp-total','imp-bonds','imp-tds','imp-mf',
+     'imp-ytreas','imp-ptreas','imp-ygm','imp-pgm','imp-mtm','imp-events'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
     document.getElementById('imp-aportes').value = '0';
     document.getElementById('imp-saidas').value  = '0';
-    document.getElementById('imp-total').value   = '';
-    document.getElementById('imp-bonds').value   = '';
-    document.getElementById('imp-tds').value     = '';
-    document.getElementById('imp-mf').value      = '';
-    document.getElementById('imp-mtm').value     = '';
-    document.getElementById('imp-events').value  = '';
     document.getElementById('imp-cash-display').textContent = '—';
     document.getElementById('imp-msg').textContent = '';
+
+    if (data) {
+      // Pre-fill from PDF data
+      const set = (id, v) => { if (v != null && v !== 0 || id === 'imp-aportes' || id === 'imp-saidas') document.getElementById(id).value = v ?? ''; };
+      set('imp-label',    data.label);
+      set('imp-fullname', data.fullName);
+      set('imp-year',     data.year);
+      set('imp-total',    data.total);
+      set('imp-bonds',    data.bonds);
+      set('imp-tds',      data.tds);
+      set('imp-mf',       data.mf);
+      set('imp-ytreas',   data.yTreas);
+      set('imp-ptreas',   data.pTreas);
+      set('imp-ygm',      data.yGM);
+      set('imp-pgm',      data.pGM);
+      set('imp-aportes',  data.aportes || 0);
+      set('imp-saidas',   data.saidas  || 0);
+      set('imp-accrual',  data.accrual);
+      set('imp-mtm',      data.mtm);
+      calcCash();
+      document.getElementById('imp-msg').textContent = '✓ Dados extraídos do PDF — revise antes de confirmar.';
+      document.getElementById('imp-msg').className = 'cfg-msg ok';
+    } else {
+      // Manual: suggest next month from last entry
+      const lastLabel = months[months.length - 1];
+      const lastFull  = monthFull[months.length - 1];
+      const mLabel = lastLabel.match(/^([A-Za-zçÇ]+)\/(\d{2})$/);
+      if (mLabel) {
+        const nm = IMP_MONTHS_PT[mLabel[1]] || '';
+        const ny = nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2];
+        document.getElementById('imp-label').value = nm + '/' + ny;
+        document.getElementById('imp-year').value = '20' + (nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2]);
+      }
+      const mFull = lastFull ? lastFull.match(/^(\w+) (\d{4})$/) : null;
+      if (mFull) {
+        const nm = IMP_FULL_PT[mFull[1]] || '';
+        const ny = nm === 'Janeiro' ? String(parseInt(mFull[2]) + 1) : mFull[2];
+        document.getElementById('imp-fullname').value = nm + ' ' + ny;
+      }
+      const li = months.length - 1;
+      if (accrual[li]) document.getElementById('imp-accrual').value = accrual[li];
+      if (yTreas[li])  document.getElementById('imp-ytreas').value  = yTreas[li];
+      if (pTreas[li])  document.getElementById('imp-ptreas').value  = pTreas[li];
+      if (yGM[li])     document.getElementById('imp-ygm').value     = yGM[li];
+      if (pGM[li])     document.getElementById('imp-pgm').value     = pGM[li];
+    }
     document.getElementById('imp-overlay').style.display = 'flex';
   };
 
