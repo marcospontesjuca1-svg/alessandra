@@ -321,6 +321,27 @@ body::before {
   letter-spacing: .05em;
 }
 
+/* ── CÂMBIO SECTION ── */
+.cb-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.cb-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+.cb-card-label { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+.cb-card-value { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text); }
+.cb-card-sub { font-size: 11px; color: var(--muted2); margin-top: .25rem; }
+.cb-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cb-table th { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: .5rem .75rem; text-align: right; border-bottom: 1px solid var(--border); }
+.cb-table th:first-child { text-align: left; }
+.cb-table td { padding: .55rem .75rem; text-align: right; border-bottom: 1px solid var(--border); color: var(--text); }
+.cb-table td:first-child { text-align: left; font-family: var(--font-mono); color: var(--muted); }
+.cb-table tr:last-child td { border-bottom: none; font-weight: 600; background: var(--surface2); }
+.cb-table tr:hover td { background: rgba(42,120,200,0.04); }
+.cb-brl { color: var(--accent2); }
+.cb-taxa { color: var(--blue); }
+
 /* ── WATERFALL ── */
 .waterfall-wrap { overflow-x: auto; }
 
@@ -913,6 +934,35 @@ body::before {
       </div>
       <input type="file" id="cfg-pdf" accept=".pdf" style="display:none" onchange="closeCfg();importPDF(this)" />
       <div class="cfg-msg" id="cfg-pdf-msg"></div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-section-label">Registrar Compra de Câmbio</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Adicione uma nova operação de câmbio. Taxa Efetiva = Total BRL ÷ US$.
+      </p>
+      <div class="imp-grid">
+        <div class="cfg-field">
+          <label>Data (dd/mm/aa)</label>
+          <input type="text" id="cb-dt" placeholder="19/01/26" maxlength="8" />
+        </div>
+        <div class="cfg-field">
+          <label>US$ Comprado</label>
+          <input type="number" id="cb-usd" placeholder="10000" />
+        </div>
+        <div class="cfg-field">
+          <label>Taxa Cambial (R$/US$)</label>
+          <input type="number" id="cb-taxa" placeholder="5.418" step="0.0001" oninput="cbCalcTotal()" />
+        </div>
+        <div class="cfg-field">
+          <label>Total BRL (ou deixe calcular)</label>
+          <input type="number" id="cb-total" placeholder="auto" step="0.01" />
+        </div>
+      </div>
+      <div class="cfg-row" style="margin-top:.5rem;">
+        <button class="cfg-action primary" onclick="addCambio()">+ Registrar</button>
+      </div>
+      <div class="cfg-msg" id="cfg-cb-msg"></div>
     </div>
   </div>
 </div>
@@ -1623,6 +1673,51 @@ body::before {
     </div>
   </section>
 
+  <!-- ══ CÂMBIO ══ -->
+  <section class="section" style="margin-top:2.5rem;">
+    <div class="section-head" style="margin-bottom:1.25rem;">
+      <span class="section-title">Controle de Câmbio</span>
+      <span class="section-sub">Histórico de compras USD · Taxa Efetiva inclui IOF 1,1%</span>
+    </div>
+    <div class="cb-kpi">
+      <div class="cb-card">
+        <div class="cb-card-label">Total USD Comprado</div>
+        <div class="cb-card-value" id="cb-total-usd">—</div>
+        <div class="cb-card-sub" id="cb-n-ops">— operações</div>
+      </div>
+      <div class="cb-card">
+        <div class="cb-card-label">Total BRL Investido</div>
+        <div class="cb-card-value cb-brl" id="cb-total-brl">—</div>
+        <div class="cb-card-sub">incluindo IOF</div>
+      </div>
+      <div class="cb-card">
+        <div class="cb-card-label">Preço Médio do Dólar</div>
+        <div class="cb-card-value cb-taxa" id="cb-preco-medio">—</div>
+        <div class="cb-card-sub">R$/US$ efetivo ponderado</div>
+      </div>
+      <div class="cb-card">
+        <div class="cb-card-label">Última Compra</div>
+        <div class="cb-card-value" id="cb-ultima-taxa">—</div>
+        <div class="cb-card-sub" id="cb-ultima-data">—</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="cb-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>US$ Comprado</th>
+            <th>Taxa Cambial</th>
+            <th>IOF (R$)</th>
+            <th>Total BRL</th>
+            <th>Taxa Efetiva</th>
+          </tr>
+        </thead>
+        <tbody id="cb-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <footer class="footer">
     <span>Portfólio 1120450 · Banco Bradesco Europa S.A. · Luxemburgo · CSSF B-18996</span>
     <span>Gerado em Abril 2026 · Dados: Extratos mensais Dez/24–Mar/26 · USD</span>
@@ -1631,6 +1726,21 @@ body::before {
 </div><!-- /page -->
 
 <script>
+// ── CÂMBIO DATA ──
+const cambioData = [
+  {"dt":"12/04/23","usd":45000,"taxa":4.9712325,"total":226166.22},
+  {"dt":"28/04/23","usd":25000,"taxa":5.01897,"total":126854.47},
+  {"dt":"17/05/23","usd":50000,"taxa":4.973745,"total":251422.81},
+  {"dt":"07/06/23","usd":100000,"taxa":4.9410825,"total":499543.44},
+  {"dt":"19/06/23","usd":50000,"taxa":4.807,"total":242993.85},
+  {"dt":"12/01/24","usd":10000,"taxa":4.882551,"total":49362.59},
+  {"dt":"07/02/25","usd":5000,"taxa":null,"total":29554.82},
+  {"dt":"19/02/25","usd":5000,"taxa":null,"total":29099.86},
+  {"dt":"12/09/25","usd":10000,"taxa":5.4125,"total":54720.38},
+  {"dt":"17/09/25","usd":1500,"taxa":5.3455,"total":8106.45},
+  {"dt":"19/01/26","usd":200000,"taxa":5.418,"total":1095519.60}
+];
+
 // ── DATA ──
 const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25','Jan/26','Fev/26','Mar/26'];
 const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809,500262,502720,475120];
@@ -2608,6 +2718,85 @@ function showTab(t) {
   document.getElementById('imp-overlay').addEventListener('click', function(e) {
     if (e.target === this) closeImport();
   });
+
+  // ── Câmbio ──
+  (function buildCambio() {
+    const fmtBRL = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const fmtUSD = v => '$' + v.toLocaleString('pt-BR', {maximumFractionDigits:0});
+    const fmtTx  = v => v != null ? v.toFixed(4) : '—';
+
+    let totalUSD = 0, totalBRL = 0;
+    const tbody = document.getElementById('cb-tbody');
+
+    cambioData.forEach(r => {
+      const efetiva = r.total / r.usd;
+      const iof     = r.taxa != null ? r.total - r.usd * r.taxa : r.total - r.total / 1.011;
+      totalUSD += r.usd;
+      totalBRL += r.total;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.dt}</td>
+        <td>${fmtUSD(r.usd)}</td>
+        <td class="cb-taxa">${fmtTx(r.taxa)}</td>
+        <td class="cb-brl">${fmtBRL(iof)}</td>
+        <td class="cb-brl">${fmtBRL(r.total)}</td>
+        <td class="cb-taxa" style="font-weight:500;">${efetiva.toFixed(4)}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    // Totals row
+    const precoMedio = totalBRL / totalUSD;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>Total</td>
+      <td>${fmtUSD(totalUSD)}</td>
+      <td>—</td>
+      <td>—</td>
+      <td class="cb-brl">${fmtBRL(totalBRL)}</td>
+      <td class="cb-taxa">${precoMedio.toFixed(4)}</td>`;
+    tbody.appendChild(tr);
+
+    // KPI cards
+    document.getElementById('cb-total-usd').textContent   = fmtUSD(totalUSD);
+    document.getElementById('cb-n-ops').textContent       = cambioData.length + ' operações';
+    document.getElementById('cb-total-brl').textContent   = fmtBRL(totalBRL);
+    document.getElementById('cb-preco-medio').textContent = 'R$ ' + precoMedio.toFixed(4);
+    const last = cambioData[cambioData.length - 1];
+    const lastTx = last.taxa != null ? last.taxa.toFixed(4) : (last.total / last.usd).toFixed(4);
+    document.getElementById('cb-ultima-taxa').textContent = 'R$ ' + lastTx;
+    document.getElementById('cb-ultima-data').textContent = last.dt + ' · ' + fmtUSD(last.usd);
+  })();
+
+  window.cbCalcTotal = function() {
+    const usd  = parseFloat(document.getElementById('cb-usd').value)  || 0;
+    const taxa = parseFloat(document.getElementById('cb-taxa').value) || 0;
+    if (usd && taxa && !document.getElementById('cb-total').value)
+      document.getElementById('cb-total').placeholder = (usd * taxa * 1.011).toFixed(2);
+  };
+
+  window.addCambio = function() {
+    const msg   = document.getElementById('cfg-cb-msg');
+    const dt    = document.getElementById('cb-dt').value.trim();
+    const usd   = parseFloat(document.getElementById('cb-usd').value);
+    const taxa  = document.getElementById('cb-taxa').value !== '' ? parseFloat(document.getElementById('cb-taxa').value) : null;
+    const totalIn = document.getElementById('cb-total').value !== '' ? parseFloat(document.getElementById('cb-total').value) : null;
+
+    if (!dt || isNaN(usd) || usd <= 0) {
+      msg.textContent = 'Preencha Data e US$.'; msg.className = 'cfg-msg err'; return;
+    }
+    if (!taxa && !totalIn) {
+      msg.textContent = 'Informe a Taxa Cambial ou o Total BRL.'; msg.className = 'cfg-msg err'; return;
+    }
+
+    const total = totalIn != null ? totalIn : usd * taxa * 1.011;
+    const newData = [...cambioData, {dt, usd, taxa, total: parseFloat(total.toFixed(2))}];
+
+    if (!confirm('Registrar compra de ' + usd.toLocaleString('pt-BR') + ' US$ em ' + dt + '?')) return;
+
+    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    html = html.replace(/const cambioData = \[[\s\S]*?\];/, 'const cambioData = ' + JSON.stringify(newData, null, 2) + ';');
+    document.open(); document.write(html); document.close();
+  };
 })();
 </script>
 </body>
