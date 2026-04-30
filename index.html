@@ -783,6 +783,57 @@ body::before {
 }
 .cfg-msg.ok { color: var(--green); }
 .cfg-msg.err { color: var(--red); }
+
+/* ── IMPORT MODAL ── */
+#imp-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,15,30,0.65);
+  z-index: 200;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+}
+.imp-modal {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border2);
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  margin: auto;
+}
+.imp-body { padding: 1.25rem 1.5rem 1.5rem; }
+.imp-section { margin-bottom: 1.25rem; }
+.imp-section-label {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: .65rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--border);
+}
+.imp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem .75rem;
+}
+.imp-full { grid-column: 1 / -1; }
+.imp-cash-row {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  color: var(--muted);
+  padding: .4rem .65rem;
+  background: var(--surface2);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin-top: .1rem;
+}
+.imp-cash-row span { color: var(--text); font-weight: 500; }
 </style>
 </head>
 <body>
@@ -848,6 +899,133 @@ body::before {
       </div>
       <input type="file" id="cfg-file" accept=".html" style="display:none" onchange="doRestore(this)" />
       <div class="cfg-msg" id="cfg-bkp-msg"></div>
+    </div>
+
+    <div class="cfg-section">
+      <div class="cfg-section-label">Importar Novo Mês</div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Adicione os dados do mês seguinte. A página recarrega com os novos dados incorporados — salve o backup em seguida.
+      </p>
+      <div class="cfg-row">
+        <button class="cfg-action primary" onclick="closeCfg();openImport()">+ Importar Mês</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPORT MODAL ══ -->
+<div id="imp-overlay">
+  <div class="imp-modal">
+    <div class="cfg-head">
+      <span class="cfg-head-title">Importar Novo Mês</span>
+      <button class="cfg-close-btn" onclick="closeImport()">×</button>
+    </div>
+    <div class="imp-body">
+
+      <div class="imp-section">
+        <div class="imp-section-label">Identificação</div>
+        <div class="imp-grid">
+          <div class="cfg-field">
+            <label>Label curto *</label>
+            <input type="text" id="imp-label" placeholder="Abr/26" oninput="impSuggest()" />
+          </div>
+          <div class="cfg-field">
+            <label>Ano *</label>
+            <input type="number" id="imp-year" placeholder="2026" min="2024" max="2035" />
+          </div>
+          <div class="cfg-field imp-full">
+            <label>Nome completo *</label>
+            <input type="text" id="imp-fullname" placeholder="Abril 2026" />
+          </div>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-section-label">Composição do Portfólio (USD)</div>
+        <div class="imp-grid">
+          <div class="cfg-field">
+            <label>Total Patrimônio *</label>
+            <input type="number" id="imp-total" placeholder="475120" oninput="calcCash()" />
+          </div>
+          <div class="cfg-field">
+            <label>Bonds</label>
+            <input type="number" id="imp-bonds" placeholder="197953" oninput="calcCash()" />
+          </div>
+          <div class="cfg-field">
+            <label>Time Deposits</label>
+            <input type="number" id="imp-tds" placeholder="93830" oninput="calcCash()" />
+          </div>
+          <div class="cfg-field">
+            <label>Fundos</label>
+            <input type="number" id="imp-mf" placeholder="178800" oninput="calcCash()" />
+          </div>
+          <div class="imp-cash-row">Cash (calculado automaticamente): <span id="imp-cash-display">—</span></div>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-section-label">Mercado — Bonds</div>
+        <div class="imp-grid">
+          <div class="cfg-field">
+            <label>Yield Treasury (%) *</label>
+            <input type="number" id="imp-ytreas" placeholder="4.16" step="0.01" />
+          </div>
+          <div class="cfg-field">
+            <label>Preço Treasury *</label>
+            <input type="number" id="imp-ptreas" placeholder="101.383" step="0.001" />
+          </div>
+          <div class="cfg-field">
+            <label>Yield GIS (%)</label>
+            <input type="number" id="imp-ygm" placeholder="5.09" step="0.01" />
+          </div>
+          <div class="cfg-field">
+            <label>Preço GIS</label>
+            <input type="number" id="imp-pgm" placeholder="99.163" step="0.001" />
+          </div>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-section-label">Fluxos Externos</div>
+        <div class="imp-grid">
+          <div class="cfg-field">
+            <label>Aportes ($)</label>
+            <input type="number" id="imp-aportes" placeholder="0" value="0" />
+          </div>
+          <div class="cfg-field">
+            <label>Saídas ($)</label>
+            <input type="number" id="imp-saidas" placeholder="0" value="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-section-label">Resultados Financeiros</div>
+        <div class="imp-grid">
+          <div class="cfg-field">
+            <label>Acruamento ($) *</label>
+            <input type="number" id="imp-accrual" placeholder="1139" />
+          </div>
+          <div class="cfg-field">
+            <label>MtM ($) *</label>
+            <input type="number" id="imp-mtm" placeholder="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="imp-section">
+        <div class="imp-section-label">Eventos do Mês (opcional)</div>
+        <div class="cfg-field">
+          <label>Labels curtos separados por vírgula</label>
+          <input type="text" id="imp-events" placeholder="Cupom Treasury, Juros TDs" />
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <button class="cfg-action primary" onclick="doImport()">✓ Importar e Recarregar</button>
+        <button class="cfg-action" onclick="closeImport()">Cancelar</button>
+      </div>
+      <div class="cfg-msg" id="imp-msg"></div>
     </div>
   </div>
 </div>
@@ -2117,6 +2295,163 @@ function showTab(t) {
     };
     reader.readAsText(file);
   };
+
+  // ── Import New Month ──
+  const IMP_MONTHS_PT = {
+    'Jan':'Fev','Fev':'Mar','Mar':'Abr','Abr':'Mai','Mai':'Jun',
+    'Jun':'Jul','Jul':'Ago','Ago':'Set','Set':'Out','Out':'Nov',
+    'Nov':'Dez','Dez':'Jan'
+  };
+  const IMP_FULL_PT = {
+    'Janeiro':'Fevereiro','Fevereiro':'Março','Março':'Abril','Abril':'Maio',
+    'Maio':'Junho','Junho':'Julho','Julho':'Agosto','Agosto':'Setembro',
+    'Setembro':'Outubro','Outubro':'Novembro','Novembro':'Dezembro','Dezembro':'Janeiro'
+  };
+
+  window.openImport = function() {
+    const lastLabel = months[months.length - 1];
+    const lastFull  = monthFull[months.length - 1];
+    const mLabel = lastLabel.match(/^([A-Za-zçÇ]+)\/(\d{2})$/);
+    if (mLabel) {
+      const nm = IMP_MONTHS_PT[mLabel[1]] || '';
+      const ny = nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2];
+      document.getElementById('imp-label').value = nm + '/' + ny;
+      document.getElementById('imp-year').value = '20' + (nm === 'Jan' ? String(parseInt(mLabel[2]) + 1) : mLabel[2]);
+    }
+    const mFull = lastFull ? lastFull.match(/^(\w+) (\d{4})$/) : null;
+    if (mFull) {
+      const nm = IMP_FULL_PT[mFull[1]] || '';
+      const ny = nm === 'Janeiro' ? String(parseInt(mFull[2]) + 1) : mFull[2];
+      document.getElementById('imp-fullname').value = nm + ' ' + ny;
+    }
+    const li = months.length - 1;
+    if (accrual[li]) document.getElementById('imp-accrual').value = accrual[li];
+    if (yTreas[li])  document.getElementById('imp-ytreas').value  = yTreas[li];
+    if (pTreas[li])  document.getElementById('imp-ptreas').value  = pTreas[li];
+    if (yGM[li])     document.getElementById('imp-ygm').value     = yGM[li];
+    if (pGM[li])     document.getElementById('imp-pgm').value     = pGM[li];
+    document.getElementById('imp-aportes').value = '0';
+    document.getElementById('imp-saidas').value  = '0';
+    document.getElementById('imp-total').value   = '';
+    document.getElementById('imp-bonds').value   = '';
+    document.getElementById('imp-tds').value     = '';
+    document.getElementById('imp-mf').value      = '';
+    document.getElementById('imp-mtm').value     = '';
+    document.getElementById('imp-events').value  = '';
+    document.getElementById('imp-cash-display').textContent = '—';
+    document.getElementById('imp-msg').textContent = '';
+    document.getElementById('imp-overlay').style.display = 'flex';
+  };
+
+  window.closeImport = function() {
+    document.getElementById('imp-overlay').style.display = 'none';
+  };
+
+  window.impSuggest = function() {
+    const label = document.getElementById('imp-label').value.trim();
+    const m = label.match(/^([A-Za-zçÇ]+)\/(\d{2})$/);
+    if (!m) return;
+    const name = {
+      'Jan':'Janeiro','Fev':'Fevereiro','Mar':'Março','Abr':'Abril','Mai':'Maio',
+      'Jun':'Junho','Jul':'Julho','Ago':'Agosto','Set':'Setembro','Out':'Outubro',
+      'Nov':'Novembro','Dez':'Dezembro'
+    }[m[1]];
+    if (name) {
+      document.getElementById('imp-fullname').value = name + ' 20' + m[2];
+      document.getElementById('imp-year').value = '20' + m[2];
+    }
+  };
+
+  window.calcCash = function() {
+    const t = parseFloat(document.getElementById('imp-total').value) || 0;
+    const b = parseFloat(document.getElementById('imp-bonds').value) || 0;
+    const d = parseFloat(document.getElementById('imp-tds').value)   || 0;
+    const f = parseFloat(document.getElementById('imp-mf').value)    || 0;
+    const c = t - b - d - f;
+    document.getElementById('imp-cash-display').textContent =
+      t > 0 ? '$' + c.toLocaleString('pt-BR', {maximumFractionDigits: 0}) : '—';
+  };
+
+  window.doImport = function() {
+    const msg = document.getElementById('imp-msg');
+    const label    = document.getElementById('imp-label').value.trim();
+    const fullName = document.getElementById('imp-fullname').value.trim();
+    const year     = parseInt(document.getElementById('imp-year').value) || 0;
+    const totalV   = parseFloat(document.getElementById('imp-total').value);
+    const bondsV   = parseFloat(document.getElementById('imp-bonds').value)   || 0;
+    const tdsV     = parseFloat(document.getElementById('imp-tds').value)     || 0;
+    const mfV      = parseFloat(document.getElementById('imp-mf').value)      || 0;
+    const cashV    = totalV - bondsV - tdsV - mfV;
+    const yTreasV  = parseFloat(document.getElementById('imp-ytreas').value);
+    const pTreasV  = parseFloat(document.getElementById('imp-ptreas').value);
+    const yGMV     = document.getElementById('imp-ygm').value !== '' ? parseFloat(document.getElementById('imp-ygm').value) : null;
+    const pGMV     = document.getElementById('imp-pgm').value !== '' ? parseFloat(document.getElementById('imp-pgm').value) : null;
+    const aportesV = parseFloat(document.getElementById('imp-aportes').value) || 0;
+    const saidasV  = parseFloat(document.getElementById('imp-saidas').value)  || 0;
+    const accrualV = parseFloat(document.getElementById('imp-accrual').value);
+    const mtmV     = parseFloat(document.getElementById('imp-mtm').value);
+    const evLabels = document.getElementById('imp-events').value.trim();
+
+    if (!label || !fullName || !year || isNaN(totalV) || isNaN(yTreasV) || isNaN(pTreasV) || isNaN(accrualV) || isNaN(mtmV)) {
+      msg.textContent = 'Preencha todos os campos obrigatórios (*).';
+      msg.className = 'cfg-msg err';
+      return;
+    }
+
+    const newIdx = months.length;
+    const nMonths    = JSON.stringify([...months, label]);
+    const nMonthFull = JSON.stringify([...monthFull, fullName]);
+    const nMonthYear = JSON.stringify([...monthYear, year]);
+    const nTotal     = JSON.stringify([...total, totalV]);
+    const nBonds     = JSON.stringify([...bonds, bondsV]);
+    const nTds       = JSON.stringify([...tds, tdsV]);
+    const nMf        = JSON.stringify([...mf, mfV]);
+    const nCash      = JSON.stringify([...cash, cashV]);
+    const nYTreas    = JSON.stringify([...yTreas, yTreasV]);
+    const nYGM       = JSON.stringify([...yGM, yGMV]);
+    const nPTreas    = JSON.stringify([...pTreas, pTreasV]);
+    const nPGM       = JSON.stringify([...pGM, pGMV]);
+    const nAportes   = JSON.stringify([...aportes, aportesV]);
+    const nSaidas    = JSON.stringify([...saidas, saidasV]);
+    const nAccrual   = JSON.stringify([...accrual, accrualV]);
+    const nMtm       = JSON.stringify([...mtm, mtmV]);
+
+    const newEventsObj = Object.assign({}, events);
+    if (evLabels) {
+      newEventsObj[newIdx] = evLabels.split(',').map(e => e.trim()).filter(Boolean);
+    }
+    const nEvents = JSON.stringify(newEventsObj);
+
+    if (!confirm('Adicionar ' + fullName + ' ao portfólio?\nA página será recarregada com os novos dados.')) return;
+
+    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+    html = html.replace(/const months = \[.*\]/, 'const months = ' + nMonths);
+    html = html.replace(/const monthFull = \[[\s\S]*?\]/, 'const monthFull = ' + nMonthFull);
+    html = html.replace(/const monthYear = \[.*\]/, 'const monthYear = ' + nMonthYear);
+    html = html.replace(/const total\s*= \[.*\]/,  'const total  = ' + nTotal);
+    html = html.replace(/const bonds\s*= \[.*\]/,  'const bonds  = ' + nBonds);
+    html = html.replace(/const tds\s*= \[.*\]/,    'const tds    = ' + nTds);
+    html = html.replace(/const mf\s*= \[.*\]/,     'const mf     = ' + nMf);
+    html = html.replace(/const cash\s*= \[.*\]/,   'const cash   = ' + nCash);
+    html = html.replace(/const yTreas = \[.*\]/,   'const yTreas = ' + nYTreas);
+    html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
+    html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
+    html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+    html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
+    html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
+    html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
+    html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
+    html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
+
+    document.open();
+    document.write(html);
+    document.close();
+  };
+
+  document.getElementById('imp-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeImport();
+  });
 })();
 </script>
 </body>
