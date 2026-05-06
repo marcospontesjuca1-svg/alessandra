@@ -710,7 +710,8 @@ body::before {
   width: 100%;
   max-width: 440px;
   margin: 1rem;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 .cfg-head {
   padding: 1.4rem 1.75rem 1rem;
@@ -738,7 +739,7 @@ body::before {
 }
 .cfg-close-btn:hover { color: var(--text); }
 .cfg-section {
-  padding: 1.4rem 1.75rem;
+  padding: .85rem 1.25rem;
   border-bottom: 1px solid var(--border);
 }
 .cfg-section:last-child { border-bottom: none; }
@@ -748,44 +749,44 @@ body::before {
   text-transform: uppercase;
   color: var(--accent);
   font-weight: 500;
-  margin-bottom: 1rem;
+  margin-bottom: .55rem;
 }
-.cfg-field { margin-bottom: .7rem; }
+.cfg-field { margin-bottom: .45rem; }
 .cfg-field label {
   display: block;
   font-size: 10px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: .35rem;
+  margin-bottom: .25rem;
 }
 .cfg-field input {
   width: 100%;
   background: var(--surface2);
   border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: .65rem .9rem;
+  border-radius: 6px;
+  padding: .4rem .7rem;
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
   outline: none;
   transition: border-color .2s;
 }
 .cfg-field input:focus { border-color: var(--accent); }
 .cfg-row {
   display: flex;
-  gap: .75rem;
-  margin-top: 1rem;
+  gap: .5rem;
+  margin-top: .6rem;
 }
 .cfg-action {
   flex: 1;
-  padding: .65rem .5rem;
-  border-radius: 8px;
+  padding: .45rem .5rem;
+  border-radius: 6px;
   border: 1px solid var(--border2);
   background: var(--surface2);
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: background .2s, border-color .2s, color .2s;
   text-align: center;
@@ -912,12 +913,9 @@ body::before {
 
     <div class="cfg-section">
       <div class="cfg-section-label">Backup &amp; Restauração</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
-        Faça o download do arquivo atual como backup, ou restaure uma versão anterior carregando um arquivo de backup.
-      </p>
-      <div class="cfg-row">
-        <button class="cfg-action primary" onclick="doBackup()">↓ Fazer Backup</button>
-        <button class="cfg-action" onclick="document.getElementById('cfg-file').click()">↑ Restaurar Backup</button>
+      <div class="cfg-row" style="margin-top:0">
+        <button class="cfg-action primary" onclick="doBackup()">↓ Backup</button>
+        <button class="cfg-action" onclick="document.getElementById('cfg-file').click()">↑ Restaurar</button>
       </div>
       <input type="file" id="cfg-file" accept=".html" style="display:none" onchange="doRestore(this)" />
       <div class="cfg-msg" id="cfg-bkp-msg"></div>
@@ -925,10 +923,7 @@ body::before {
 
     <div class="cfg-section">
       <div class="cfg-section-label">Importar Novo Mês</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
-        Importe o PDF do extrato mensal do Bradesco Europa — os dados são extraídos automaticamente.
-      </p>
-      <div class="cfg-row">
+      <div class="cfg-row" style="margin-top:0">
         <button class="cfg-action primary" onclick="document.getElementById('cfg-pdf').click()">📄 Importar PDF</button>
         <button class="cfg-action" onclick="closeCfg();openImport()">✎ Manual</button>
       </div>
@@ -937,11 +932,8 @@ body::before {
     </div>
 
     <div class="cfg-section">
-      <div class="cfg-section-label">Registrar Compra de Câmbio</div>
-      <p style="font-size:11px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
-        Adicione uma nova operação de câmbio. Taxa Efetiva = Total BRL ÷ US$.
-      </p>
-      <div class="imp-grid">
+      <div class="cfg-section-label">Câmbio · Nova Compra</div>
+      <div class="imp-grid" style="gap:.35rem .6rem;">
         <div class="cfg-field">
           <label>Data (dd/mm/aa)</label>
           <input type="text" id="cb-dt" placeholder="19/01/26" maxlength="8" />
@@ -951,16 +943,16 @@ body::before {
           <input type="number" id="cb-usd" placeholder="10000" />
         </div>
         <div class="cfg-field">
-          <label>Taxa Cambial (R$/US$)</label>
+          <label>Taxa Cambial</label>
           <input type="number" id="cb-taxa" placeholder="5.418" step="0.0001" oninput="cbCalcTotal()" />
         </div>
         <div class="cfg-field">
-          <label>Total BRL (ou deixe calcular)</label>
+          <label>Total BRL (opt.)</label>
           <input type="number" id="cb-total" placeholder="auto" step="0.01" />
         </div>
       </div>
-      <div class="cfg-row" style="margin-top:.5rem;">
-        <button class="cfg-action primary" onclick="addCambio()">+ Registrar</button>
+      <div class="cfg-row" style="margin-top:.4rem;">
+        <button class="cfg-action primary" onclick="addCambio()">+ Registrar Câmbio</button>
       </div>
       <div class="cfg-msg" id="cfg-cb-msg"></div>
     </div>
@@ -2708,11 +2700,33 @@ function showTab(t) {
     html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
     html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
     html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
-    html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
-
-    document.open();
-    document.write(html);
-    document.close();
+    const applyAll = function(html) {
+      html = html.replace(/const months = \[.*\]/, 'const months = ' + nMonths);
+      html = html.replace(/const monthFull = \[[\s\S]*?\]/, 'const monthFull = ' + nMonthFull);
+      html = html.replace(/const monthYear = \[.*\]/, 'const monthYear = ' + nMonthYear);
+      html = html.replace(/const total\s*= \[.*\]/,  'const total  = ' + nTotal);
+      html = html.replace(/const bonds\s*= \[.*\]/,  'const bonds  = ' + nBonds);
+      html = html.replace(/const tds\s*= \[.*\]/,    'const tds    = ' + nTds);
+      html = html.replace(/const mf\s*= \[.*\]/,     'const mf     = ' + nMf);
+      html = html.replace(/const cash\s*= \[.*\]/,   'const cash   = ' + nCash);
+      html = html.replace(/const yTreas = \[.*\]/,   'const yTreas = ' + nYTreas);
+      html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
+      html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
+      html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+      html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
+      html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
+      html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
+      html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
+      html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
+      document.open(); document.write(html); document.close();
+    };
+    msg.textContent = '✓ Importado! Recarregando...'; msg.className = 'cfg-msg ok';
+    if (location.protocol === 'file:') {
+      setTimeout(function() { applyAll('<!DOCTYPE html>\n' + document.documentElement.outerHTML); }, 300);
+    } else {
+      fetch(location.href).then(r => r.text()).then(applyAll)
+        .catch(() => applyAll('<!DOCTYPE html>\n' + document.documentElement.outerHTML));
+    }
   };
 
   document.getElementById('imp-overlay').addEventListener('click', function(e) {
@@ -2774,6 +2788,27 @@ function showTab(t) {
       document.getElementById('cb-total').placeholder = (usd * taxa * 1.011).toFixed(2);
   };
 
+  function applyHTMLReplace(pattern, replacement, msg, successMsg) {
+    msg.textContent = 'Atualizando...'; msg.className = 'cfg-msg ok';
+    var doWrite = function(html) {
+      var replaced = html.replace(pattern, replacement);
+      if (replaced === html) {
+        msg.textContent = 'Erro: dados não localizados no HTML. Use Backup/Restaurar.';
+        msg.className = 'cfg-msg err'; return;
+      }
+      msg.textContent = successMsg;
+      setTimeout(function() { document.open(); document.write(replaced); document.close(); }, 700);
+    };
+    if (location.protocol === 'file:') {
+      doWrite('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+    } else {
+      fetch(location.href)
+        .then(function(r) { return r.text(); })
+        .then(doWrite)
+        .catch(function() { doWrite('<!DOCTYPE html>\n' + document.documentElement.outerHTML); });
+    }
+  }
+
   window.addCambio = function() {
     const msg     = document.getElementById('cfg-cb-msg');
     const dt      = document.getElementById('cb-dt').value.trim();
@@ -2792,21 +2827,10 @@ function showTab(t) {
 
     const total   = totalIn != null ? totalIn : parseFloat((usd * taxa * 1.011).toFixed(2));
     const newData = [...cambioData, {dt, usd, taxa, total}];
+    const newJSON = 'const cambioData = ' + JSON.stringify(newData) + ';';
 
-    let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    const replaced = html.replace(/const cambioData = \[[\s\S]*?\];/, 'const cambioData = ' + JSON.stringify(newData) + ';');
-
-    if (replaced === html) {
-      msg.textContent = 'Erro interno ao atualizar — faça Backup e restaure.';
-      msg.className = 'cfg-msg err'; return;
-    }
-
-    msg.textContent = '✓ Registrado! Recarregando...';
-    msg.className = 'cfg-msg ok';
-
-    setTimeout(function() {
-      document.open(); document.write(replaced); document.close();
-    }, 600);
+    applyHTMLReplace(/const cambioData = \[[\s\S]*?\];/, newJSON, msg,
+      '✓ Câmbio registrado! Recarregando...');
   };
 })();
 </script>
