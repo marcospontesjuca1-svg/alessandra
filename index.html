@@ -2290,7 +2290,11 @@ function showTab(t) {
 
   // ── Login ──
   const overlay = document.getElementById('login-overlay');
-  if (sessionStorage.getItem('auth') === '1') overlay.style.display = 'none';
+  if (sessionStorage.getItem('auth') === '1' || localStorage.getItem('_auth') === '1') {
+    overlay.style.display = 'none';
+    sessionStorage.setItem('auth', '1');
+    localStorage.removeItem('_auth');
+  }
 
   document.getElementById('login-user').addEventListener('keydown', e => {
     if (e.key === 'Enter') document.getElementById('login-pass').focus();
@@ -2797,6 +2801,7 @@ function showTab(t) {
         msg.className = 'cfg-msg err'; return;
       }
       msg.textContent = successMsg;
+      localStorage.setItem('_auth', '1');
       setTimeout(function() { document.open(); document.write(replaced); document.close(); }, 700);
     };
     if (location.protocol === 'file:') {
