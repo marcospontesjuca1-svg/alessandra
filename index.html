@@ -2371,17 +2371,33 @@ function showTab(t) {
 
   // ── Backup ──
   window.doBackup = function() {
-    const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
-    const a = document.createElement('a');
-    const date = new Date().toISOString().slice(0,10);
-    a.href = URL.createObjectURL(blob);
-    a.download = 'portfolio-backup-' + date + '.html';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    const msg = document.getElementById('cfg-bkp-msg');
-    msg.textContent = 'Backup baixado: ' + a.download;
-    msg.className = 'cfg-msg ok';
+    const extras = JSON.parse(localStorage.getItem('cambioExtras') || '[]');
+    const makeBackup = function(html) {
+      if (extras.length > 0) {
+        const existing = new Set(cambioData.map(r => r.dt + '|' + r.usd));
+        const newExtras = extras.filter(r => !existing.has(r.dt + '|' + r.usd));
+        if (newExtras.length > 0) {
+          const fullData = [...cambioData, ...newExtras];
+          html = html.replace(/const cambioData = \[[\s\S]*?\];/, 'const cambioData = ' + JSON.stringify(fullData) + ';');
+        }
+      }
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      const date = new Date().toISOString().slice(0,10);
+      a.href = URL.createObjectURL(blob);
+      a.download = 'portfolio-backup-' + date + '.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      const msg = document.getElementById('cfg-bkp-msg');
+      msg.textContent = 'Backup baixado: ' + a.download + (extras.length ? ' (+' + extras.length + ' câmbio local)' : '');
+      msg.className = 'cfg-msg ok';
+    };
+    if (extras.length > 0 && location.protocol !== 'file:') {
+      fetch(location.href).then(r => r.text()).then(makeBackup)
+        .catch(() => makeBackup('<!DOCTYPE html>\n' + document.documentElement.outerHTML));
+    } else {
+      makeBackup('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+    }
   };
 
   // ── Restaurar ──
@@ -2738,15 +2754,23 @@ function showTab(t) {
   });
 
   // ── Câmbio ──
-  (function buildCambio() {
+  function getAllCambio() {
+    const extras = JSON.parse(localStorage.getItem('cambioExtras') || '[]');
+    const existing = new Set(cambioData.map(r => r.dt + '|' + r.usd));
+    return [...cambioData, ...extras.filter(r => !existing.has(r.dt + '|' + r.usd))];
+  }
+
+  function renderCambio() {
     const fmtBRL = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
     const fmtUSD = v => '$' + v.toLocaleString('pt-BR', {maximumFractionDigits:0});
     const fmtTx  = v => v != null ? v.toFixed(4) : '—';
 
+    const data = getAllCambio();
     let totalUSD = 0, totalBRL = 0;
     const tbody = document.getElementById('cb-tbody');
+    tbody.innerHTML = '';
 
-    cambioData.forEach(r => {
+    data.forEach(r => {
       const efetiva = r.total / r.usd;
       const iof     = r.taxa != null ? r.total - r.usd * r.taxa : r.total - r.total / 1.011;
       totalUSD += r.usd;
@@ -2776,14 +2800,16 @@ function showTab(t) {
 
     // KPI cards
     document.getElementById('cb-total-usd').textContent   = fmtUSD(totalUSD);
-    document.getElementById('cb-n-ops').textContent       = cambioData.length + ' operações';
+    document.getElementById('cb-n-ops').textContent       = data.length + ' operações';
     document.getElementById('cb-total-brl').textContent   = fmtBRL(totalBRL);
     document.getElementById('cb-preco-medio').textContent = 'R$ ' + precoMedio.toFixed(4);
-    const last = cambioData[cambioData.length - 1];
+    const last = data[data.length - 1];
     const lastTx = last.taxa != null ? last.taxa.toFixed(4) : (last.total / last.usd).toFixed(4);
     document.getElementById('cb-ultima-taxa').textContent = 'R$ ' + lastTx;
     document.getElementById('cb-ultima-data').textContent = last.dt + ' · ' + fmtUSD(last.usd);
-  })();
+  }
+
+  renderCambio();
 
   window.cbCalcTotal = function() {
     const usd  = parseFloat(document.getElementById('cb-usd').value)  || 0;
@@ -2830,12 +2856,21 @@ function showTab(t) {
       msg.textContent = 'Informe a Taxa Cambial ou o Total BRL.'; msg.className = 'cfg-msg err'; return;
     }
 
-    const total   = totalIn != null ? totalIn : parseFloat((usd * taxa * 1.011).toFixed(2));
-    const newData = [...cambioData, {dt, usd, taxa, total}];
-    const newJSON = 'const cambioData = ' + JSON.stringify(newData) + ';';
+    const total  = totalIn != null ? totalIn : parseFloat((usd * taxa * 1.011).toFixed(2));
+    const extras = JSON.parse(localStorage.getItem('cambioExtras') || '[]');
+    extras.push({dt, usd, taxa, total});
+    localStorage.setItem('cambioExtras', JSON.stringify(extras));
 
-    applyHTMLReplace(/const cambioData = \[[\s\S]*?\];/, newJSON, msg,
-      '✓ Câmbio registrado! Recarregando...');
+    renderCambio();
+
+    document.getElementById('cb-dt').value    = '';
+    document.getElementById('cb-usd').value   = '';
+    document.getElementById('cb-taxa').value  = '';
+    document.getElementById('cb-total').value = '';
+    document.getElementById('cb-total').placeholder = '';
+
+    msg.textContent = '✓ Registrado! Faça Backup para salvar permanentemente.';
+    msg.className = 'cfg-msg ok';
   };
 })();
 </script>
