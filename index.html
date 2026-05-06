@@ -951,6 +951,10 @@ body::before {
           <input type="number" id="cb-total" placeholder="auto" step="0.01" />
         </div>
       </div>
+      <div class="cfg-field" style="margin-top:.3rem;">
+        <label>Token GitHub (para salvar automaticamente)</label>
+        <input type="password" id="cb-gh-token" placeholder="ghp_..." style="font-size:.75rem;" />
+      </div>
       <div class="cfg-row" style="margin-top:.4rem;">
         <button class="cfg-action primary" onclick="addCambio()">+ Registrar Câmbio</button>
       </div>
@@ -2328,6 +2332,9 @@ function showTab(t) {
     document.getElementById('cfg-cnf').value = '';
     document.getElementById('cfg-pass-msg').textContent = '';
     document.getElementById('cfg-bkp-msg').textContent = '';
+    document.getElementById('cfg-cb-msg').textContent = '';
+    const t = localStorage.getItem('ghToken');
+    if (t) document.getElementById('cb-gh-token').value = t;
     document.getElementById('cfg-overlay').classList.add('open');
   };
 
@@ -2869,8 +2876,78 @@ function showTab(t) {
     document.getElementById('cb-total').value = '';
     document.getElementById('cb-total').placeholder = '';
 
-    msg.textContent = '✓ Registrado! Faça Backup para salvar permanentemente.';
+    // Save token
+    const tokenEl = document.getElementById('cb-gh-token');
+    const token = tokenEl.value.trim();
+    if (token) localStorage.setItem('ghToken', token);
+
+    const allData = getAllCambio();
+
+    if (!token) {
+      msg.textContent = '\u2713 Registrado localmente. Configure o Token GitHub para salvar permanentemente.';
+      msg.className = 'cfg-msg ok';
+      return;
+    }
+
+    msg.textContent = 'Salvando no GitHub...';
     msg.className = 'cfg-msg ok';
+
+    // Fetch current file from GitHub API to get SHA
+    fetch('https://api.github.com/repos/marcospontesjuca1-svg/alessandra/contents/index.html', {
+      headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(meta) {
+      const sha = meta.sha;
+      // Get raw HTML from GitHub (not the base64 API response, avoids size limits)
+      return fetch('https://raw.githubusercontent.com/marcospontesjuca1-svg/alessandra/main/index.html', {
+        cache: 'no-store'
+      }).then(function(r) { return r.text(); }).then(function(html) {
+        return { sha: sha, html: html };
+      });
+    })
+    .then(function(obj) {
+      // Replace cambioData in the fetched HTML with merged data
+      const newJSON = 'const cambioData = ' + JSON.stringify(allData) + ';';
+      const newHtml = obj.html.replace(/const cambioData = \[[\s\S]*?\];/, newJSON);
+      if (newHtml === obj.html) {
+        msg.textContent = 'Erro: padr\u00e3o cambioData n\u00e3o encontrado no HTML do GitHub.';
+        msg.className = 'cfg-msg err'; return;
+      }
+      // Encode to base64 (handle UTF-8)
+      const encoded = btoa(unescape(encodeURIComponent(newHtml)));
+      return fetch('https://api.github.com/repos/marcospontesjuca1-svg/alessandra/contents/index.html', {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify({
+          message: 'Registrar c\u00e2mbio ' + dt + ' US$' + usd,
+          content: encoded,
+          sha: obj.sha,
+          branch: 'main'
+        })
+      });
+    })
+    .then(function(r) {
+      if (!r) return;
+      if (r.ok) {
+        localStorage.removeItem('cambioExtras');
+        msg.textContent = '\u2713 Salvo no GitHub! A p\u00e1gina ir\u00e1 atualizar em ~2 min.';
+        msg.className = 'cfg-msg ok';
+      } else {
+        return r.json().then(function(e) {
+          msg.textContent = 'Erro GitHub: ' + (e.message || r.status);
+          msg.className = 'cfg-msg err';
+        });
+      }
+    })
+    .catch(function(e) {
+      msg.textContent = 'Erro de rede: ' + e.message;
+      msg.className = 'cfg-msg err';
+    });
   };
 })();
 </script>
