@@ -2775,11 +2775,13 @@ function showTab(t) {
   };
 
   window.addCambio = function() {
-    const msg   = document.getElementById('cfg-cb-msg');
-    const dt    = document.getElementById('cb-dt').value.trim();
-    const usd   = parseFloat(document.getElementById('cb-usd').value);
-    const taxa  = document.getElementById('cb-taxa').value !== '' ? parseFloat(document.getElementById('cb-taxa').value) : null;
-    const totalIn = document.getElementById('cb-total').value !== '' ? parseFloat(document.getElementById('cb-total').value) : null;
+    const msg     = document.getElementById('cfg-cb-msg');
+    const dt      = document.getElementById('cb-dt').value.trim();
+    const usd     = parseFloat(document.getElementById('cb-usd').value);
+    const taxaStr = document.getElementById('cb-taxa').value.trim();
+    const totStr  = document.getElementById('cb-total').value.trim();
+    const taxa    = taxaStr !== '' ? parseFloat(taxaStr) : null;
+    const totalIn = totStr  !== '' ? parseFloat(totStr)  : null;
 
     if (!dt || isNaN(usd) || usd <= 0) {
       msg.textContent = 'Preencha Data e US$.'; msg.className = 'cfg-msg err'; return;
@@ -2788,14 +2790,23 @@ function showTab(t) {
       msg.textContent = 'Informe a Taxa Cambial ou o Total BRL.'; msg.className = 'cfg-msg err'; return;
     }
 
-    const total = totalIn != null ? totalIn : usd * taxa * 1.011;
-    const newData = [...cambioData, {dt, usd, taxa, total: parseFloat(total.toFixed(2))}];
-
-    if (!confirm('Registrar compra de ' + usd.toLocaleString('pt-BR') + ' US$ em ' + dt + '?')) return;
+    const total   = totalIn != null ? totalIn : parseFloat((usd * taxa * 1.011).toFixed(2));
+    const newData = [...cambioData, {dt, usd, taxa, total}];
 
     let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    html = html.replace(/const cambioData = \[[\s\S]*?\];/, 'const cambioData = ' + JSON.stringify(newData, null, 2) + ';');
-    document.open(); document.write(html); document.close();
+    const replaced = html.replace(/const cambioData = \[[\s\S]*?\];/, 'const cambioData = ' + JSON.stringify(newData) + ';');
+
+    if (replaced === html) {
+      msg.textContent = 'Erro interno ao atualizar — faça Backup e restaure.';
+      msg.className = 'cfg-msg err'; return;
+    }
+
+    msg.textContent = '✓ Registrado! Recarregando...';
+    msg.className = 'cfg-msg ok';
+
+    setTimeout(function() {
+      document.open(); document.write(replaced); document.close();
+    }, 600);
   };
 })();
 </script>
