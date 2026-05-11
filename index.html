@@ -2432,7 +2432,20 @@ function showTab(t) {
   // ── PDF Parser ──
   function parseBradescoStatement(rawText) {
     const t = rawText.replace(/\s+/g, ' ').trim();
-    const parseNum = s => parseFloat((s || '0').replace(/,/g, ''));
+
+    // Handles both European (1.234,56) and English (1,234.56) number formats
+    const parseNum = s => {
+      if (!s) return 0;
+      const str = s.replace(/\s/g, '');
+      const lastComma = str.lastIndexOf(',');
+      const lastDot   = str.lastIndexOf('.');
+      if (lastComma > lastDot) {
+        // European: period=thousands, comma=decimal → "94.237,91"
+        return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+      }
+      // English: comma=thousands, period=decimal → "94,237.91"
+      return parseFloat(str.replace(/,/g, '')) || 0;
+    };
 
     // Period end date → month label
     const periodM = t.match(/Period:\s+\d{2}\/\d{2}\/\d{2}\s+to\s+\d{2}\/(\d{2})\/(\d{2})/i);
@@ -2451,20 +2464,40 @@ function showTab(t) {
       fullName = full + ' ' + year;
     }
 
-    // Consolidated totals
-    const totalV  = parseNum(t.match(/Net Position in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
-    const cashV   = parseNum(t.match(/Total CASH ACCOUNT in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
-    const tdsV    = parseNum(t.match(/Total TIME DEPOSIT in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
-    const bondsV  = parseNum(t.match(/Total BONDS in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
-    const mfV     = parseNum(t.match(/Total MUTUAL FUNDS in US\$:\s*([\d,]+\.?\d*)/i)?.[1]);
+    // Consolidated totals — allows optional space before colon ("US$ :" or "US$:")
+    const totalV = parseNum(t.match(/Net Position in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const cashV  = parseNum(t.match(/Total CASH ACCOUNT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const tdsV   = parseNum(t.match(/Total TIME DEPOSIT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const bondsV = parseNum(t.match(/Total BONDS in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const mfV    = parseNum(t.match(/Total MUTUAL FUNDS in US\$\s*:\s*([\d.,]+)/i)?.[1]);
 
-    // Bond prices and yields (GIS before Treasury in document)
-    const gisBlock   = t.match(/GENERAL MILLS.*?(?=US TREASURY|MUTUAL FUNDS)/)?.[0] || '';
-    const treasBlock = t.match(/US TREASURY.*?(?=GENERAL MILLS|MUTUAL FUNDS|Account Total)/)?.[0] || '';
-    const pGMV    = gisBlock   ? parseFloat(gisBlock.match(/Market Price:\s*([\d.]+)/)?.[1]   || 0) || null : null;
-    const yGMV    = gisBlock   ? parseFloat(gisBlock.match(/Market Yield:\s*([\d.]+)/)?.[1]   || 0) || null : null;
-    const pTreasV = treasBlock ? parseFloat(treasBlock.match(/Market Price:\s*([\d.]+)/)?.[1] || 0) || null : null;
-    const yTreasV = treasBlock ? parseFloat(treasBlock.match(/Market Yield:\s*([\d.]+)/)?.[1] || 0) || null : null;
+    // Bond section blocks — include BANK OF AMERICA as a terminator
+    const gisBlock   = t.match(/GENERAL MILLS.*?(?=US TREASURY|BANK OF AMERICA|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    const treasBlock = t.match(/US TREASURY.*?(?=BANK OF AMERICA|GENERAL MILLS|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    const bacBlock   = t.match(/BANK OF AMERICA.*?(?=GENERAL MILLS|US TREASURY|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+
+    // Market yields: in tabular PDF text, percentages appear in order:
+    // coupon% → purchase_yield% → market_yield% — take the 3rd (index 2)
+    const extractYield = block => {
+      if (!block) return null;
+      const ms = [...block.matchAll(/(\d+[.,]\d+)%/g)];
+      if (ms.length >= 3) return parseFloat(ms[2][1].replace(',', '.'));
+      if (ms.length >= 2) return parseFloat(ms[1][1].replace(',', '.'));
+      return null;
+    };
+
+    // Market prices: in PDF tabular layout, the market price value appears
+    // just before the ISIN code — pattern: "XX,XXXXXX [market_value] [ISIN]"
+    const extractPrice = isin => {
+      const m = t.match(new RegExp('(\\d{2,3}[.,]\\d{3,6})\\s+[\\d.,]+\\s+' + isin));
+      if (m) return parseFloat(m[1].replace(',', '.'));
+      return null;
+    };
+
+    const pGMV    = gisBlock   ? extractPrice('US370334CT90') : null;
+    const yGMV    = gisBlock   ? extractYield(gisBlock)       : null;
+    const pTreasV = treasBlock ? extractPrice('US91282CKQ32') : null;
+    const yTreasV = treasBlock ? extractYield(treasBlock)     : null;
 
     // External payments (saidas): EXT PMT debits
     let saidasV = 0;
@@ -2472,38 +2505,66 @@ function showTab(t) {
       saidasV += parseNum(m[1]);
     saidasV = Math.round(saidasV);
 
+    // Aportes: CR - ALESSANDRA credits (debit col is 0,00 → next value is credit)
+    let aportesV = 0;
+    for (const m of t.matchAll(/CR\s*-\s*ALESSANDRA[^\d]{0,80}0[.,]00\s+([\d.,]+)/gi))
+      aportesV += parseNum(m[1]);
+    aportesV = Math.round(aportesV);
+
     // Fund redemptions (SALE credits from BRADESCO INT C)
     let fundRedemptions = 0;
-    for (const m of t.matchAll(/SALE[^C]{0,40}BRADESCO INT C[^C]{0,40}Credit:\s*([\d,]+\.?\d*)/g))
+    for (const m of t.matchAll(/SALE[^B]{0,60}BRADESCO INT C[^\d]{0,40}0[.,]00\s+([\d.,]+)/gi))
       fundRedemptions += parseNum(m[1]);
 
-    // Accrual: TDs (principal × rate / 12) + bonds (face × coupon / 12)
+    // Accrual: TDs — find principal amounts and interest rates
+    // "Transaction Amount [principal] [next_int]" appears in each TD section
     let accrualV = 0;
-    const tdSections = t.split(/TIME DEPOSIT — Account:/);
-    tdSections.shift();
-    for (const s of tdSections) {
-      const p = parseNum(s.match(/Principal Amount:\s*([\d,]+\.?\d*)/)?.[1]);
-      const r = parseFloat(s.match(/Interest Rate:\s*([\d.]+)/)?.[1] || 0);
-      if (p && r) accrualV += p * r / 100 / 12;
+    const tdSec = t.match(/TIME DEPOSIT\b[\s\S]*?(?=BONDS\s|Total BONDS)/i)?.[0] || '';
+    for (const m of tdSec.matchAll(/Transaction\s+Amount\s+([\d.,]+)/gi)) {
+      const principal = parseNum(m[1]);
+      if (principal < 5000) continue;
+      // Rate appears as 6-decimal number near dates: "5,440000 28/06/24"
+      const rateM = tdSec.match(/(\d+[.,]\d{4,6})\s+\d{2}\/\d{2}\/\d{2}/);
+      const rate  = rateM ? parseFloat(rateM[1].replace(',', '.')) : 0;
+      if (rate > 0) accrualV += principal * rate / 100 / 12;
     }
-    for (const s of [gisBlock, treasBlock]) {
-      const f = parseNum(s.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]);
-      const c = parseFloat(s.match(/Coupon:\s*([\d.]+)/)?.[1] || 0);
-      if (f && c) accrualV += f * c / 100 / 12;
+    // Fallback: derive principal from ENDING BALANCE (round to nearest 5000)
+    if (accrualV === 0) {
+      for (const m of tdSec.matchAll(/ENDING BALANCE:\s*([\d,]+\.?\d*)/gi)) {
+        const bal  = parseNum(m[1]);
+        if (bal < 5000 || bal > 500000) continue;
+        const principal = Math.round(bal / 5000) * 5000;
+        const rateM = tdSec.match(/(\d+[.,]\d{4,6})\s+\d{2}\/\d{2}\/\d{2}/);
+        const rate  = rateM ? parseFloat(rateM[1].replace(',', '.')) : 0;
+        if (rate > 0) accrualV += principal * rate / 100 / 12;
+      }
     }
+
+    // Accrual: bonds (face × coupon / 12) — face/coupon appear as "50.000 4,950%" in tabular text
+    const extractBondAccrual = block => {
+      if (!block) return 0;
+      const m = block.match(/([\d.,]+)\s+(\d+[.,]\d+)%/);
+      if (!m) return 0;
+      const face   = parseNum(m[1]);
+      const coupon = parseFloat(m[2].replace(',', '.'));
+      return (face > 0 && coupon > 0) ? face * coupon / 100 / 12 : 0;
+    };
+    accrualV += extractBondAccrual(gisBlock);
+    accrualV += extractBondAccrual(treasBlock);
+    accrualV += extractBondAccrual(bacBlock);
     accrualV = Math.round(accrualV);
 
-    // MtM: bond price change × face value + MF NAV change
+    // MtM: bond price change × face + MF NAV change
     let mtmV = 0;
     if (pTreasV && pTreas.length) {
       const prevPT = pTreas[pTreas.length - 1];
-      const faceT  = parseNum(treasBlock.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]) || 144000;
-      mtmV += (pTreasV - prevPT) / 100 * faceT;
+      const fM = treasBlock.match(/([\d.,]+)\s+\d+[.,]\d+%/);
+      mtmV += (pTreasV - prevPT) / 100 * (fM ? parseNum(fM[1]) : 144000);
     }
     if (pGMV && pGM.length) {
       const prevPG = pGM[pGM.length - 1];
-      const faceG  = parseNum(gisBlock.match(/Face Value:\s*([\d,]+\.?\d*)/)?.[1]) || 50000;
-      mtmV += (pGMV - prevPG) / 100 * faceG;
+      const fM = gisBlock.match(/([\d.,]+)\s+\d+[.,]\d+%/);
+      mtmV += (pGMV - prevPG) / 100 * (fM ? parseNum(fM[1]) : 50000);
     }
     // MF MtM: current value − (prev value − redemptions)
     const prevMF = mf[mf.length - 1] || 0;
@@ -2512,7 +2573,7 @@ function showTab(t) {
 
     return { label, fullName, year, total: totalV, bonds: bondsV, tds: tdsV,
              mf: mfV, cash: cashV, pTreas: pTreasV, yTreas: yTreasV,
-             pGM: pGMV, yGM: yGMV, saidas: saidasV, aportes: 0,
+             pGM: pGMV, yGM: yGMV, saidas: saidasV, aportes: aportesV,
              accrual: accrualV, mtm: mtmV };
   }
 
@@ -2569,23 +2630,25 @@ function showTab(t) {
     document.getElementById('imp-msg').textContent = '';
 
     if (data) {
-      // Pre-fill from PDF data
-      const set = (id, v) => { if (v != null && v !== 0 || id === 'imp-aportes' || id === 'imp-saidas') document.getElementById(id).value = v ?? ''; };
+      // Pre-fill from PDF data — always set a value so required fields are never empty/NaN
+      const set = (id, v) => { document.getElementById(id).value = (v !== null && v !== undefined) ? v : ''; };
+      const lastI = months.length - 1;
       set('imp-label',    data.label);
       set('imp-fullname', data.fullName);
       set('imp-year',     data.year);
       set('imp-total',    data.total);
-      set('imp-bonds',    data.bonds);
-      set('imp-tds',      data.tds);
-      set('imp-mf',       data.mf);
-      set('imp-ytreas',   data.yTreas);
-      set('imp-ptreas',   data.pTreas);
-      set('imp-ygm',      data.yGM);
-      set('imp-pgm',      data.pGM);
+      set('imp-bonds',    data.bonds   || 0);
+      set('imp-tds',      data.tds     || 0);
+      set('imp-mf',       data.mf      || 0);
+      // Bond yields/prices: use extracted value or fall back to previous month as default
+      set('imp-ytreas',   data.yTreas  !== null ? data.yTreas : (yTreas[lastI] ?? ''));
+      set('imp-ptreas',   data.pTreas  !== null ? data.pTreas : (pTreas[lastI] ?? ''));
+      set('imp-ygm',      data.yGM     !== null ? data.yGM    : (yGM[lastI]   ?? ''));
+      set('imp-pgm',      data.pGM     !== null ? data.pGM    : (pGM[lastI]   ?? ''));
       set('imp-aportes',  data.aportes || 0);
       set('imp-saidas',   data.saidas  || 0);
-      set('imp-accrual',  data.accrual);
-      set('imp-mtm',      data.mtm);
+      set('imp-accrual',  data.accrual || 0);
+      set('imp-mtm',      data.mtm     || 0);
       calcCash();
       document.getElementById('imp-msg').textContent = '✓ Dados extraídos do PDF — revise antes de confirmar.';
       document.getElementById('imp-msg').className = 'cfg-msg ok';
