@@ -1855,11 +1855,11 @@ function updateHeader(key) {
 
 // Acruamento de juros mensal estimado (Treasury + TDs + GIS)
 // Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206
-const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1578];
+const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1139];
 
 // Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
 // Treasury face $144k, GIS face $50k (a partir de Mai/25), MF variação de NAV
-const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017,1409];
+const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017,414];
 
 const gc = { grid:'rgba(0,40,100,0.10)', tick:'rgba(20,50,100,0.65)' };
 const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
