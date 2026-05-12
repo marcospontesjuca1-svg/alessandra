@@ -2796,6 +2796,7 @@ function showTab(t) {
       html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
       html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
       html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
+      localStorage.setItem('_auth', '1');
       document.open(); document.write(html); document.close();
     };
     msg.textContent = '✓ Importado! Recarregando...'; msg.className = 'cfg-msg ok';
