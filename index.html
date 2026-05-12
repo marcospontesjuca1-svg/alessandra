@@ -2802,7 +2802,29 @@ function showTab(t) {
       html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
       html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
       html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
-      reloadWithHTML(html);
+
+      const token = localStorage.getItem('ghToken');
+      if (token && location.protocol === 'https:') {
+        msg.textContent = '✓ Importado! Salvando no GitHub...'; msg.className = 'cfg-msg ok';
+        const apiUrl = 'https://api.github.com/repos/marcospontesjuca1-svg/alessandra/contents/index.html';
+        fetch(apiUrl, { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } })
+          .then(r => r.json())
+          .then(function(meta) {
+            const encoded = btoa(unescape(encodeURIComponent(html)));
+            return fetch(apiUrl, {
+              method: 'PUT',
+              headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+              body: JSON.stringify({ message: 'Importar ' + fullName, content: encoded, sha: meta.sha, branch: 'main' })
+            });
+          })
+          .then(function(r) {
+            if (r && r.ok) msg.textContent = '✓ Salvo no GitHub! Abrindo dashboard...'; msg.className = 'cfg-msg ok';
+            reloadWithHTML(html);
+          })
+          .catch(function() { reloadWithHTML(html); });
+      } else {
+        reloadWithHTML(html);
+      }
     };
     msg.textContent = '✓ Importado! Recarregando...'; msg.className = 'cfg-msg ok';
     if (location.protocol === 'file:') {
