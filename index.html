@@ -1771,56 +1771,6 @@ const events = {
 const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2026,2026,2026,2026];
 
 // Dados do cabeçalho por ano
-const yearKPIs = {
-  all: {
-    patLabel:'Patrimônio Mar/2026', patValue:'$475.120', patSub:'Posição mais recente',
-    maxValue:'$502.720', maxSub:'Fevereiro/2026',
-    apValue:'$269.590', apSub:'2025: Fev+Mai+Set · 2026: Jan', apClass:'up',
-    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set) — 2025', cupClass:'up',
-    jurValue:'$8.921', jurSub:'TDs — 2025 + Jan–Mar/2026', jurClass:'up',
-    rentValue:'+6,09%', rentSub:'excluindo aportes e saídas externas', rentClass:'up',
-    yieldValue:'4,16%', yieldSub:'vs 4,55% em Dez/24 (–39bps)', yieldClass:'up',
-    heroRent:'+6,09%', heroRentColor:'var(--green)', heroSub:'excl. aportes e saídas externas',
-    heroGrowth:'+97,9% crescimento bruto de patrimônio', heroRange:'$239.882 → $475.120',
-    heroYear:'2024–2026', heroPeriod:'Dezembro 2024 → Março 2026',
-  },
-  2025: {
-    patLabel:'Patrimônio Dez/2025', patValue:'$329.809', patSub:'Posição final 2025',
-    maxValue:'$330.679', maxSub:'Novembro/2025',
-    apValue:'$69.590', apSub:'Fev + Mai + Set/2025', apClass:'up',
-    cupValue:'$7.538', cupSub:'Treasury (Mai/Nov) + GIS (Set)', cupClass:'up',
-    jurValue:'$5.449', jurSub:'TDs 442/443/444/888', jurClass:'up',
-    rentValue:'+7,37%', rentSub:'excluindo aportes externos', rentClass:'up',
-    yieldValue:'4,05%', yieldSub:'vs 4,55% em Dez/24 (–50bps)', yieldClass:'up',
-    heroRent:'+7,37%', heroRentColor:'var(--green)', heroSub:'excl. aportes externos',
-    heroGrowth:'+37,5% crescimento bruto', heroRange:'$239.882 → $329.809',
-    heroYear:'2025', heroPeriod:'Janeiro 2025 → Dezembro 2025',
-  },
-  2024: {
-    patLabel:'Patrimônio Dez/2024', patValue:'$239.882', patSub:'Posição inicial — base',
-    maxValue:'$239.882', maxSub:'Dezembro/2024',
-    apValue:'—', apSub:'Sem aportes identificados', apClass:'nu',
-    cupValue:'—', cupSub:'Período base', cupClass:'nu',
-    jurValue:'—', jurSub:'Período base', jurClass:'nu',
-    rentValue:'base', rentSub:'período de referência', rentClass:'nu',
-    yieldValue:'4,55%', yieldSub:'Posição em Dezembro/2024', yieldClass:'nu',
-    heroRent:'base', heroRentColor:'var(--muted)', heroSub:'período de referência',
-    heroGrowth:'Portfólio em Dez/2024', heroRange:'$239.882',
-    heroYear:'2024', heroPeriod:'Dezembro 2024',
-  },
-  2026: {
-    patLabel:'Patrimônio Mar/2026', patValue:'$475.120', patSub:'Posição final Mar/2026',
-    maxValue:'$502.720', maxSub:'Fevereiro/2026',
-    apValue:'$200.000', apSub:'Janeiro/2026', apClass:'up',
-    cupValue:'—', cupSub:'Nenhum cupom em Jan–Mar/2026', cupClass:'nu',
-    jurValue:'$3.472', jurSub:'TDs — Jan–Mar/2026', jurClass:'up',
-    rentValue:'–1,27%', rentSub:'excluindo aportes e saídas externas', rentClass:'dn',
-    yieldValue:'4,16%', yieldSub:'vs 4,05% em Dez/25 (+11bps)', yieldClass:'nu',
-    heroRent:'–1,27%', heroRentColor:'var(--red)', heroSub:'excl. aportes e saídas externas',
-    heroGrowth:'YTD 2026: –1,27% (impacto MtM)', heroRange:'$329.809 → $475.120',
-    heroYear:'2026', heroPeriod:'Janeiro 2026 → Março 2026',
-  }
-};
 
 function updateHeader(key) {
   const d = yearKPIs[key] || yearKPIs.all;
@@ -1919,6 +1869,144 @@ const monthFull = [
   'Outubro 2025','Novembro 2025','Dezembro 2025',
   'Janeiro 2026','Fevereiro 2026','Março 2026','Abril 2026'
 ];
+
+// Receita de cupons por ano (pagamentos semi-anuais dos bonds — não rastreados nos arrays)
+const cupomByYear = {
+  2025: { value: '$7.538', sub: 'Treasury (Mai/Nov) + GIS (Set)' },
+};
+
+const yearKPIs = (function buildYearKPIs() {
+  const fmtM  = v => '$' + Math.round(v).toLocaleString('pt-BR');
+  const fmtPct = v => (v >= 0 ? '+' : '') + (v * 100).toFixed(2).replace('.', ',') + '%';
+
+  function kpiYear(y) {
+    const idx = monthYear.reduce((arr, yr, i) => { if (yr === y) arr.push(i); return arr; }, []);
+    if (!idx.length) return null;
+    const first = idx[0], last = idx[idx.length - 1];
+    const prevLast = first - 1; // último mês do ano anterior
+
+    // Patrimônio do último mês do ano
+    const pat = total[last];
+
+    // Máximo no período do ano
+    let maxI = first;
+    idx.forEach(i => { if (total[i] > total[maxI]) maxI = i; });
+
+    // Aportes e saídas do ano
+    const apSum    = idx.reduce((s, i) => s + (aportes[i] || 0), 0);
+    const saidaSum = idx.reduce((s, i) => s + (saidas[i]  || 0), 0);
+
+    // Accrual acumulado do ano
+    const jurSum = idx.reduce((s, i) => s + (accrual[i] || 0), 0);
+
+    // Rentabilidade acumulada do ano (produto das rentabilidades mensais)
+    let rentProd = 1;
+    idx.forEach(i => { if (rentMes[i] !== null) rentProd *= (1 + rentMes[i]); });
+    const rent = rentProd - 1;
+
+    // Yield Treasury do último mês e comparação com início do período
+    const yld      = yTreas[last];
+    const yldPrev  = prevLast >= 0 ? yTreas[prevLast] : null;
+    const bps      = yldPrev !== null ? Math.round((yld - yldPrev) * 100) : null;
+    const bpsStr   = bps !== null ? (bps >= 0 ? `+${bps}bps` : `${bps}bps`) : '';
+    const yldPrevFmt = yldPrev !== null ? yldPrev.toFixed(2).replace('.', ',') + '%' : '';
+
+    // Cupons de bonds (hardcoded por ano — não rastreados nos arrays)
+    const cup = cupomByYear[y] || { value: '—', sub: `Nenhum cupom registrado em ${y}` };
+
+    // Período e hero
+    const firstFull = monthFull[first];
+    const lastFull  = monthFull[last];
+    const prevPat   = prevLast >= 0 ? total[prevLast] : null;
+    const growthYr  = prevPat ? (pat / prevPat - 1) : 0;
+    const isLast    = last === months.length - 1;
+
+    // Labels de aportes (meses com aporte)
+    const apMeses = idx.filter(i => aportes[i] > 0)
+      .map(i => monthFull[i].split(' ')[0]).join(' + ');
+
+    return {
+      patLabel: `Patrimônio ${lastFull}`,
+      patValue: fmtM(pat),
+      patSub:   isLast ? 'Posição mais recente' : `Posição final ${y}`,
+      maxValue: fmtM(total[maxI]),
+      maxSub:   monthFull[maxI],
+      apValue:  apSum > 0 ? fmtM(apSum) : '—',
+      apSub:    apSum > 0 ? (apMeses || String(y)) : 'Sem aportes identificados',
+      apClass:  apSum > 0 ? 'up' : 'nu',
+      cupValue: cup.value,
+      cupSub:   cup.sub,
+      cupClass: cup.value !== '—' ? 'up' : 'nu',
+      jurValue: jurSum > 0 ? fmtM(jurSum) : '—',
+      jurSub:   jurSum > 0 ? `TDs + bonds — ${firstFull.split(' ')[0]}–${lastFull}` : `Período base`,
+      jurClass: jurSum > 0 ? 'up' : 'nu',
+      rentValue: y === 2024 ? 'base' : fmtPct(rent),
+      rentSub:  'excluindo aportes e saídas externas',
+      rentClass: y === 2024 ? 'nu' : (rent >= 0 ? 'up' : 'dn'),
+      yieldValue: yld ? yld.toFixed(2).replace('.', ',') + '%' : '—',
+      yieldSub:  bps !== null ? `vs ${yldPrevFmt} em ${monthFull[prevLast]} (${bpsStr})` : '',
+      yieldClass: bps !== null ? (bps <= 0 ? 'up' : 'nu') : 'nu',
+      heroRent:       y === 2024 ? 'base' : fmtPct(rent),
+      heroRentColor:  y === 2024 ? 'var(--muted)' : (rent >= 0 ? 'var(--green)' : 'var(--red)'),
+      heroSub:        y === 2024 ? 'período de referência' : 'excl. aportes e saídas externas',
+      heroGrowth:     y === 2024
+        ? `Portfólio em ${lastFull}`
+        : `${fmtPct(growthYr)} em ${y} · YTD`,
+      heroRange:  prevPat ? `${fmtM(prevPat)} → ${fmtM(pat)}` : fmtM(pat),
+      heroYear:   String(y),
+      heroPeriod: prevLast >= 0
+        ? `${firstFull} → ${lastFull}`
+        : lastFull,
+    };
+  }
+
+  // KPI "Todos" — usa todos os meses disponíveis
+  const lastI  = months.length - 1;
+  const firstI = 0;
+  let maxIAll = 0;
+  total.forEach((v, i) => { if (v > total[maxIAll]) maxIAll = i; });
+  let allRentProd = 1;
+  for (let i = 1; i <= lastI; i++) { if (rentMes[i] !== null) allRentProd *= (1 + rentMes[i]); }
+  const allRent  = allRentProd - 1;
+  const apSumAll = aportes.reduce((s, v) => s + (v || 0), 0);
+  const jurAll   = accrual.reduce((s, v) => s + (v || 0), 0);
+  const yldLast  = yTreas[lastI], yldFirst = yTreas[firstI];
+  const bpsAll   = Math.round((yldLast - yldFirst) * 100);
+
+  const result = {
+    all: {
+      patLabel: `Patrimônio ${monthFull[lastI]}`,
+      patValue: '$' + Math.round(total[lastI]).toLocaleString('pt-BR'),
+      patSub:   'Posição mais recente',
+      maxValue: '$' + Math.round(total[maxIAll]).toLocaleString('pt-BR'),
+      maxSub:   monthFull[maxIAll],
+      apValue:  '$' + Math.round(apSumAll).toLocaleString('pt-BR'),
+      apSub:    'Total de aportes externos',
+      apClass:  'up',
+      cupValue: '—', cupSub: 'Ver por ano', cupClass: 'nu',
+      jurValue: '$' + Math.round(jurAll).toLocaleString('pt-BR'),
+      jurSub:   'Accrual acumulado (TDs + bonds)',
+      jurClass: 'up',
+      rentValue: (allRent >= 0 ? '+' : '') + (allRent * 100).toFixed(2).replace('.', ',') + '%',
+      rentSub:  'excluindo aportes e saídas externas',
+      rentClass: allRent >= 0 ? 'up' : 'dn',
+      yieldValue: yldLast.toFixed(2).replace('.', ',') + '%',
+      yieldSub:  `vs ${yldFirst.toFixed(2).replace('.', ',')}% em ${monthFull[firstI]} (${bpsAll >= 0 ? '+' : ''}${bpsAll}bps)`,
+      yieldClass: 'up',
+      heroRent:      (allRent >= 0 ? '+' : '') + (allRent * 100).toFixed(2).replace('.', ',') + '%',
+      heroRentColor: allRent >= 0 ? 'var(--green)' : 'var(--red)',
+      heroSub:       'excl. aportes e saídas externas',
+      heroGrowth:    '+' + ((total[lastI] / total[firstI] - 1) * 100).toFixed(1).replace('.', ',') + '% crescimento bruto de patrimônio',
+      heroRange:     '$' + Math.round(total[firstI]).toLocaleString('pt-BR') + ' → $' + Math.round(total[lastI]).toLocaleString('pt-BR'),
+      heroYear:      `${monthYear[firstI]}–${monthYear[lastI]}`,
+      heroPeriod:    `${monthFull[firstI]} → ${monthFull[lastI]}`,
+    }
+  };
+
+  [...new Set(monthYear)].forEach(y => { const k = kpiYear(y); if (k) result[y] = k; });
+  return result;
+})();
+updateHeader('all'); // inicializa painel com último mês disponível
 const allEvents = {
   2:  [{icon:'💵', text:'Aporte externo de $10.000', type:'aporte'}],
   3:  [{icon:'🏦', text:'Abertura TD 210015888 — 4,70% a.a., 720 dias', type:'invest'}],
