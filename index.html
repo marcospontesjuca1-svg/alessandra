@@ -2280,6 +2280,14 @@ function showTab(t) {
     return localStorage.getItem('pwd') || DEFAULT_PASS;
   }
 
+  // Navigates to a new page context with the given HTML, bypassing the JS
+  // realm issue that causes "already declared" errors with document.write.
+  function reloadWithHTML(html) {
+    localStorage.setItem('_auth', '1');
+    const blob = new Blob([html], { type: 'text/html' });
+    window.location.href = URL.createObjectURL(blob);
+  }
+
   // ── Login ──
   const overlay = document.getElementById('login-overlay');
   if (sessionStorage.getItem('auth') === '1' || localStorage.getItem('_auth') === '1') {
@@ -2406,9 +2414,7 @@ function showTab(t) {
         input.value = '';
         return;
       }
-      document.open();
-      document.write(e.target.result);
-      document.close();
+      reloadWithHTML(e.target.result);
     };
     reader.onerror = function() {
       msg.textContent = 'Erro ao ler o arquivo.';
@@ -2796,8 +2802,7 @@ function showTab(t) {
       html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
       html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
       html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
-      localStorage.setItem('_auth', '1');
-      document.open(); document.write(html); document.close();
+      reloadWithHTML(html);
     };
     msg.textContent = '✓ Importado! Recarregando...'; msg.className = 'cfg-msg ok';
     if (location.protocol === 'file:') {
@@ -2886,8 +2891,7 @@ function showTab(t) {
         msg.className = 'cfg-msg err'; return;
       }
       msg.textContent = successMsg;
-      localStorage.setItem('_auth', '1');
-      setTimeout(function() { document.open(); document.write(replaced); document.close(); }, 700);
+      setTimeout(function() { reloadWithHTML(replaced); }, 700);
     };
     if (location.protocol === 'file:') {
       doWrite('<!DOCTYPE html>\n' + document.documentElement.outerHTML);
