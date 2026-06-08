@@ -932,6 +932,20 @@ body::before {
     </div>
 
     <div class="cfg-section">
+      <div class="cfg-section-label">Excluir Período</div>
+      <div class="cfg-field">
+        <label>Selecionar mês para excluir</label>
+        <select id="del-period-sel" style="width:100%;padding:.35rem .5rem;border:1px solid var(--border2);border-radius:6px;background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:12px;">
+          <option value="">— selecione —</option>
+        </select>
+      </div>
+      <div class="cfg-row" style="margin-top:.4rem;">
+        <button class="cfg-action" style="color:var(--red);border-color:var(--red);" onclick="doDeletePeriod()">✕ Excluir Período</button>
+      </div>
+      <div class="cfg-msg" id="cfg-del-msg"></div>
+    </div>
+
+    <div class="cfg-section">
       <div class="cfg-section-label">Câmbio · Nova Compra</div>
       <div class="imp-grid" style="gap:.35rem .6rem;">
         <div class="cfg-field">
@@ -2417,8 +2431,12 @@ function showTab(t) {
     document.getElementById('cfg-pass-msg').textContent = '';
     document.getElementById('cfg-bkp-msg').textContent = '';
     document.getElementById('cfg-cb-msg').textContent = '';
+    document.getElementById('cfg-del-msg').textContent = '';
     const t = localStorage.getItem('ghToken');
     if (t) document.getElementById('cb-gh-token').value = t;
+    const sel = document.getElementById('del-period-sel');
+    sel.innerHTML = '<option value="">— selecione —</option>';
+    months.forEach(function(m, i) { sel.innerHTML += '<option value="' + i + '">' + m + '</option>'; });
     document.getElementById('cfg-overlay').classList.add('open');
   };
 
@@ -2429,6 +2447,98 @@ function showTab(t) {
   document.getElementById('cfg-overlay').addEventListener('click', function(e) {
     if (e.target === this) closeCfg();
   });
+
+  // ── Excluir Período ──
+  window.doDeletePeriod = function() {
+    const msg = document.getElementById('cfg-del-msg');
+    const sel = document.getElementById('del-period-sel');
+    const idx = parseInt(sel.value);
+    if (isNaN(idx) || sel.value === '') {
+      msg.textContent = 'Selecione um mês para excluir.';
+      msg.className = 'cfg-msg err';
+      return;
+    }
+    const mLabel = months[idx];
+    if (!confirm('Excluir o período "' + mLabel + '" de todos os dados?\nEsta ação não pode ser desfeita.')) return;
+
+    function removeAt(arr, i) { return [...arr.slice(0, i), ...arr.slice(i + 1)]; }
+
+    const nMonths    = JSON.stringify(removeAt(months, idx));
+    const nMonthFull = JSON.stringify(removeAt(monthFull, idx));
+    const nMonthYear = JSON.stringify(removeAt(monthYear, idx));
+    const nTotal     = JSON.stringify(removeAt(total, idx));
+    const nBonds     = JSON.stringify(removeAt(bonds, idx));
+    const nTds       = JSON.stringify(removeAt(tds, idx));
+    const nMf        = JSON.stringify(removeAt(mf, idx));
+    const nCash      = JSON.stringify(removeAt(cash, idx));
+    const nYTreas    = JSON.stringify(removeAt(yTreas, idx));
+    const nYGM       = JSON.stringify(removeAt(yGM, idx));
+    const nPTreas    = JSON.stringify(removeAt(pTreas, idx));
+    const nPGM       = JSON.stringify(removeAt(pGM, idx));
+    const nAportes   = JSON.stringify(removeAt(aportes, idx));
+    const nSaidas    = JSON.stringify(removeAt(saidas, idx));
+    const nAccrual   = JSON.stringify(removeAt(accrual, idx));
+    const nMtm       = JSON.stringify(removeAt(mtm, idx));
+
+    const newEventsObj = {};
+    Object.keys(events).forEach(function(k) {
+      const ki = parseInt(k);
+      if (ki < idx) newEventsObj[ki] = events[ki];
+      else if (ki > idx) newEventsObj[ki - 1] = events[ki];
+    });
+    const nEvents = JSON.stringify(newEventsObj);
+
+    const applyDel = function(html) {
+      html = html.replace(/const months = \[.*\]/, 'const months = ' + nMonths);
+      html = html.replace(/const monthFull = \[[\s\S]*?\]/, 'const monthFull = ' + nMonthFull);
+      html = html.replace(/const monthYear = \[.*\]/, 'const monthYear = ' + nMonthYear);
+      html = html.replace(/const total\s*= \[.*\]/,  'const total  = ' + nTotal);
+      html = html.replace(/const bonds\s*= \[.*\]/,  'const bonds  = ' + nBonds);
+      html = html.replace(/const tds\s*= \[.*\]/,    'const tds    = ' + nTds);
+      html = html.replace(/const mf\s*= \[.*\]/,     'const mf     = ' + nMf);
+      html = html.replace(/const cash\s*= \[.*\]/,   'const cash   = ' + nCash);
+      html = html.replace(/const yTreas = \[.*\]/,   'const yTreas = ' + nYTreas);
+      html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
+      html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
+      html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+      html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
+      html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
+      html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
+      html = html.replace(/const mtm = \[.*\]/,      'const mtm = ' + nMtm);
+      html = html.replace(/const events = \{[\s\S]*?\};/, 'const events = ' + nEvents + ';');
+
+      const token = localStorage.getItem('ghToken');
+      if (token && location.protocol === 'https:') {
+        msg.textContent = 'Excluindo e salvando no GitHub...'; msg.className = 'cfg-msg ok';
+        const apiUrl = 'https://api.github.com/repos/marcospontesjuca1-svg/alessandra/contents/index.html';
+        fetch(apiUrl, { headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' } })
+          .then(r => r.json())
+          .then(function(meta) {
+            const encoded = btoa(unescape(encodeURIComponent(html)));
+            return fetch(apiUrl, {
+              method: 'PUT',
+              headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
+              body: JSON.stringify({ message: 'Excluir período ' + mLabel, content: encoded, sha: meta.sha, branch: 'main' })
+            });
+          })
+          .then(function(r) {
+            if (r && r.ok) msg.textContent = '✓ Salvo no GitHub! Recarregando...'; msg.className = 'cfg-msg ok';
+            reloadWithHTML(html);
+          })
+          .catch(function() { reloadWithHTML(html); });
+      } else {
+        reloadWithHTML(html);
+      }
+    };
+
+    msg.textContent = 'Excluindo período... Recarregando.'; msg.className = 'cfg-msg ok';
+    if (location.protocol === 'file:') {
+      setTimeout(function() { applyDel('<!DOCTYPE html>\n' + document.documentElement.outerHTML); }, 300);
+    } else {
+      fetch(location.href).then(r => r.text()).then(applyDel)
+        .catch(() => applyDel('<!DOCTYPE html>\n' + document.documentElement.outerHTML));
+    }
+  };
 
   // ── Mudar Senha ──
   window.changePassword = function() {
@@ -2828,31 +2938,38 @@ function showTab(t) {
       return;
     }
 
-    const newIdx = months.length;
-    const nMonths    = JSON.stringify([...months, label]);
-    const nMonthFull = JSON.stringify([...monthFull, fullName]);
-    const nMonthYear = JSON.stringify([...monthYear, year]);
-    const nTotal     = JSON.stringify([...total, totalV]);
-    const nBonds     = JSON.stringify([...bonds, bondsV]);
-    const nTds       = JSON.stringify([...tds, tdsV]);
-    const nMf        = JSON.stringify([...mf, mfV]);
-    const nCash      = JSON.stringify([...cash, cashV]);
-    const nYTreas    = JSON.stringify([...yTreas, yTreasV]);
-    const nYGM       = JSON.stringify([...yGM, yGMV]);
-    const nPTreas    = JSON.stringify([...pTreas, pTreasV]);
-    const nPGM       = JSON.stringify([...pGM, pGMV]);
-    const nAportes   = JSON.stringify([...aportes, aportesV]);
-    const nSaidas    = JSON.stringify([...saidas, saidasV]);
-    const nAccrual   = JSON.stringify([...accrual, accrualV]);
-    const nMtm       = JSON.stringify([...mtm, mtmV]);
+    const existIdx = months.indexOf(label);
+    const isUpdate = existIdx !== -1;
+    const newIdx   = isUpdate ? existIdx : months.length;
+
+    function replaceAt(arr, idx, val) { const c = [...arr]; c[idx] = val; return c; }
+
+    const nMonths    = isUpdate ? JSON.stringify(replaceAt(months, existIdx, label))    : JSON.stringify([...months, label]);
+    const nMonthFull = isUpdate ? JSON.stringify(replaceAt(monthFull, existIdx, fullName)) : JSON.stringify([...monthFull, fullName]);
+    const nMonthYear = isUpdate ? JSON.stringify(replaceAt(monthYear, existIdx, year))  : JSON.stringify([...monthYear, year]);
+    const nTotal     = isUpdate ? JSON.stringify(replaceAt(total, existIdx, totalV))    : JSON.stringify([...total, totalV]);
+    const nBonds     = isUpdate ? JSON.stringify(replaceAt(bonds, existIdx, bondsV))    : JSON.stringify([...bonds, bondsV]);
+    const nTds       = isUpdate ? JSON.stringify(replaceAt(tds, existIdx, tdsV))        : JSON.stringify([...tds, tdsV]);
+    const nMf        = isUpdate ? JSON.stringify(replaceAt(mf, existIdx, mfV))          : JSON.stringify([...mf, mfV]);
+    const nCash      = isUpdate ? JSON.stringify(replaceAt(cash, existIdx, cashV))      : JSON.stringify([...cash, cashV]);
+    const nYTreas    = isUpdate ? JSON.stringify(replaceAt(yTreas, existIdx, yTreasV))  : JSON.stringify([...yTreas, yTreasV]);
+    const nYGM       = isUpdate ? JSON.stringify(replaceAt(yGM, existIdx, yGMV))        : JSON.stringify([...yGM, yGMV]);
+    const nPTreas    = isUpdate ? JSON.stringify(replaceAt(pTreas, existIdx, pTreasV))  : JSON.stringify([...pTreas, pTreasV]);
+    const nPGM       = isUpdate ? JSON.stringify(replaceAt(pGM, existIdx, pGMV))        : JSON.stringify([...pGM, pGMV]);
+    const nAportes   = isUpdate ? JSON.stringify(replaceAt(aportes, existIdx, aportesV)): JSON.stringify([...aportes, aportesV]);
+    const nSaidas    = isUpdate ? JSON.stringify(replaceAt(saidas, existIdx, saidasV))  : JSON.stringify([...saidas, saidasV]);
+    const nAccrual   = isUpdate ? JSON.stringify(replaceAt(accrual, existIdx, accrualV)): JSON.stringify([...accrual, accrualV]);
+    const nMtm       = isUpdate ? JSON.stringify(replaceAt(mtm, existIdx, mtmV))        : JSON.stringify([...mtm, mtmV]);
 
     const newEventsObj = Object.assign({}, events);
     if (evLabels) {
       newEventsObj[newIdx] = evLabels.split(',').map(e => e.trim()).filter(Boolean);
+    } else if (isUpdate) {
+      delete newEventsObj[newIdx];
     }
     const nEvents = JSON.stringify(newEventsObj);
 
-    if (!confirm('Adicionar ' + fullName + ' ao portfólio?\nA página será recarregada com os novos dados.')) return;
+    if (!confirm((isUpdate ? 'Atualizar dados de ' : 'Adicionar ') + fullName + ' ao portfólio?\nA página será recarregada com os novos dados.')) return;
 
     let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
@@ -2902,7 +3019,7 @@ function showTab(t) {
             return fetch(apiUrl, {
               method: 'PUT',
               headers: { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-              body: JSON.stringify({ message: 'Importar ' + fullName, content: encoded, sha: meta.sha, branch: 'main' })
+              body: JSON.stringify({ message: (isUpdate ? 'Atualizar ' : 'Importar ') + fullName, content: encoded, sha: meta.sha, branch: 'main' })
             });
           })
           .then(function(r) {
