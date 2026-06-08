@@ -1740,23 +1740,23 @@ body::before {
 const cambioData = [{"dt":"12/04/23","usd":45000,"taxa":4.9712325,"total":226166.22},{"dt":"28/04/23","usd":25000,"taxa":5.01897,"total":126854.47},{"dt":"17/05/23","usd":50000,"taxa":4.973745,"total":251422.81},{"dt":"07/06/23","usd":100000,"taxa":4.9410825,"total":499543.44},{"dt":"19/06/23","usd":50000,"taxa":4.807,"total":242993.85},{"dt":"12/01/24","usd":10000,"taxa":4.882551,"total":49362.59},{"dt":"07/02/25","usd":5000,"taxa":null,"total":29554.82},{"dt":"19/02/25","usd":5000,"taxa":null,"total":29099.86},{"dt":"12/09/25","usd":10000,"taxa":5.4125,"total":54720.38},{"dt":"17/09/25","usd":1500,"taxa":5.3455,"total":8106.45},{"dt":"19/01/26","usd":200000,"taxa":5.418,"total":1095519.6},{"dt":"08/04/26","usd":3000,"taxa":5.147,"total":15610.85}];
 
 // ── DATA ──
-const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25','Jan/26','Fev/26','Mar/26','Abr/26'];
-const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809,500262,502720,475120,479673];
-const bonds  = [142821,143810,147402,148538,149476,194269,197101,196775,200029,200394,201646,200775,199331,199557,203483,197953,296400];
-const tds    = [92543, 92965, 93346,107815,108278,108756,104317,104796,105274,105737,106215,106678,107156, 93028, 93408, 93830, 94238];
-const mf     = [0,0,0,0,0,0,0,7023,7099,7165,19239,19282,19428,7521,202772,178800,81789];
-const cash   = [4518,4518,14518,483,483,2248,7107,107,107,12794,794,3944,3893,200156,3056,4536,7246];
-const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05,4.10,3.82,4.16,4.31];
-const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69,4.72,4.57,5.09,5.13];
-const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188,101.883,103.836,101.383,100.371];
-const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496,101.334,102.188,99.163,98.918];
+const months = ['Dez/24','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez/25','Jan/26','Fev/26','Mar/26','Abr/26','Mai/26'];
+const total  = [239882,241293,255266,256836,258237,305273,308526,308700,312509,326090,327894,330679,329809,500262,502720,475120,479673,482571];
+const bonds  = [142821,143810,147402,148538,149476,194269,197101,196775,200029,200394,201646,200775,199331,199557,203483,197953,296400,294404];
+const tds    = [92543, 92965, 93346,107815,108278,108756,104317,104796,105274,105737,106215,106678,107156, 93028, 93408, 93830, 94238, 94660];
+const mf     = [0,0,0,0,0,0,0,7023,7099,7165,19239,19282,19428,7521,202772,178800,81789,83113];
+const cash   = [4518,4518,14518,483,483,2248,7107,107,107,12794,794,3944,3893,200156,3056,4536,7246,10394];
+const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05,4.10,3.82,4.16,4.31,4.36];
+const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69,4.72,4.57,5.09,5.13,5.05];
+const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188,101.883,103.836,101.383,100.371,100.039];
+const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496,101.334,102.188,99.163,98.918,99.399];
 const bondsPct = bonds.map((b,i) => total[i]>0 ? +(b/total[i]*100).toFixed(1) : 0);
 
 // Aportes externos (transferências bancárias entradas)
-const aportes = [0, 0, 10000, 0, 0, 48090, 0, 0, 0, 11500, 0, 0, 0, 200000, 0, 0, 3000];
+const aportes = [0, 0, 10000, 0, 0, 48090, 0, 0, 0, 11500, 0, 0, 0, 200000, 0, 0, 3000, 0];
 
 // Saídas externas (pagamentos a terceiros que reduzem patrimônio mas não são perda de investimento)
-const saidas  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30320, 0, 17708, 0];
+const saidas  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30320, 0, 17708, 0, 0];
 
 // Rentabilidade mensal real = (Total[i] - Aporte[i] + Saida[i]) / Total[i-1] - 1
 const rentMes = months.map((m,i) => {
@@ -1782,7 +1782,7 @@ const events = {
 };
 
 // Ano de cada mês (para filtro)
-const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2026,2026,2026,2026];
+const monthYear = [2024,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2025,2026,2026,2026,2026,2026];
 
 // Dados do cabeçalho por ano
 
@@ -1819,11 +1819,11 @@ function updateHeader(key) {
 
 // Acruamento de juros mensal estimado (Treasury + TDs + GIS)
 // Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206
-const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1139];
+const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1139,1577];
 
 // Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
 // Treasury face $144k, GIS face $50k (a partir de Mai/25), MF variação de NAV
-const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017,414];
+const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017,414,1321];
 
 const gc = { grid:'rgba(0,40,100,0.10)', tick:'rgba(20,50,100,0.65)' };
 const fmt = v => '$' + (v>=1000 ? (v/1000).toFixed(0)+'k' : v.toFixed(0));
@@ -1881,7 +1881,7 @@ const monthFull = [
   'Dezembro 2024','Janeiro 2025','Fevereiro 2025','Março 2025','Abril 2025',
   'Maio 2025','Junho 2025','Julho 2025','Agosto 2025','Setembro 2025',
   'Outubro 2025','Novembro 2025','Dezembro 2025',
-  'Janeiro 2026','Fevereiro 2026','Março 2026','Abril 2026'
+  'Janeiro 2026','Fevereiro 2026','Março 2026','Abril 2026','Maio 2026'
 ];
 
 // Receita de cupons por ano (pagamentos semi-anuais dos bonds — não rastreados nos arrays)
@@ -2637,7 +2637,7 @@ function showTab(t) {
   function parseBradescoStatement(rawText) {
     const t = rawText.replace(/\s+/g, ' ').trim();
 
-    // Handles both European (1.234,56) and English (1,234.56) number formats
+    // Handles both European (1.234,56 or 50.000) and English (1,234.56) number formats
     const parseNum = s => {
       if (!s) return 0;
       const str = s.replace(/\s/g, '');
@@ -2646,6 +2646,10 @@ function showTab(t) {
       if (lastComma > lastDot) {
         // European: period=thousands, comma=decimal → "94.237,91"
         return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+      }
+      // European thousands only, no comma decimal → "50.000", "144.000"
+      if (lastComma === -1 && /^\d{1,3}(\.\d{3})+$/.test(str)) {
+        return parseFloat(str.replace(/\./g, '')) || 0;
       }
       // English: comma=thousands, period=decimal → "94,237.91"
       return parseFloat(str.replace(/,/g, '')) || 0;
@@ -2668,17 +2672,27 @@ function showTab(t) {
       fullName = full + ' ' + year;
     }
 
-    // Consolidated totals — allows optional space before colon ("US$ :" or "US$:")
+    // Consolidated totals — Net Position uses English format; section totals have value BEFORE label
     const totalV = parseNum(t.match(/Net Position in US\$\s*:\s*([\d.,]+)/i)?.[1]);
-    const cashV  = parseNum(t.match(/Total CASH ACCOUNT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
-    const tdsV   = parseNum(t.match(/Total TIME DEPOSIT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
-    const bondsV = parseNum(t.match(/Total BONDS in US\$\s*:\s*([\d.,]+)/i)?.[1]);
-    const mfV    = parseNum(t.match(/Total MUTUAL FUNDS in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const cashV  = parseNum(t.match(/([\d.,]+)\s+Total CASH ACCOUNT in US\$/i)?.[1]
+                            || t.match(/Total CASH ACCOUNT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const tdsV   = parseNum(t.match(/([\d.,]+)\s+Total TIME DEPOSIT in US\$/i)?.[1]
+                            || t.match(/Total TIME DEPOSIT in US\$\s*:\s*([\d.,]+)/i)?.[1]);
+    const bondsV = parseNum(t.match(/([\d.,]+)\s+Total BONDS in US\$/i)?.[1]
+                            || t.match(/Total BONDS in US\$\s*:\s*([\d.,]+)/i)?.[1]
+                            || t.match(/Account Total in BONDS\s*:\s*([\d.,]+)/i)?.[1]);
+    const mfV    = parseNum(t.match(/([\d.,]+)\s+Total MUTUAL FUNDS in US\$/i)?.[1]
+                            || t.match(/Total MUTUAL FUNDS in US\$\s*:\s*([\d.,]+)/i)?.[1]
+                            || t.match(/Account Total in MUTUAL FUNDS\s*:\s*([\d.,]+)/i)?.[1]);
 
-    // Bond section blocks — include BANK OF AMERICA as a terminator
-    const gisBlock   = t.match(/GENERAL MILLS.*?(?=US TREASURY|BANK OF AMERICA|MUTUAL FUNDS|Account Total)/)?.[0] || '';
-    const treasBlock = t.match(/US TREASURY.*?(?=BANK OF AMERICA|GENERAL MILLS|MUTUAL FUNDS|Account Total)/)?.[0] || '';
-    const bacBlock   = t.match(/BANK OF AMERICA.*?(?=GENERAL MILLS|US TREASURY|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    // Bond section blocks: in Bradesco PDF the company name appears AFTER the bond data,
+    // so blocks are anchored by ISIN (before the name) for correct yield/accrual extraction
+    const gisBlock   = t.match(/US370334CT90[\s\S]*?(?=GENERAL MILLS)/)?.[0]
+                       || t.match(/GENERAL MILLS.*?(?=US TREASURY|BANK OF AMERICA|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    const treasBlock = t.match(/US91282CKQ32[\s\S]*?(?=US TREASURY)/)?.[0]
+                       || t.match(/US TREASURY.*?(?=BANK OF AMERICA|GENERAL MILLS|MUTUAL FUNDS|Account Total)/)?.[0] || '';
+    const bacBlock   = t.match(/US06051GMA49[\s\S]*?(?=BANK OF AMERICA)/)?.[0]
+                       || t.match(/BANK OF AMERICA.*?(?=GENERAL MILLS|US TREASURY|MUTUAL FUNDS|Account Total)/)?.[0] || '';
 
     // Market yields: in tabular PDF text, percentages appear in order:
     // coupon% → purchase_yield% → market_yield% — take the 3rd (index 2)
@@ -2690,10 +2704,10 @@ function showTab(t) {
       return null;
     };
 
-    // Market prices: in PDF tabular layout, the market price value appears
-    // just before the ISIN code — pattern: "XX,XXXXXX [market_value] [ISIN]"
+    // Market prices: format is "XX,XXXXXX [date_or_value] [ISIN]" — middle token
+    // may be a date (29/03/33) so use \S+ instead of [\d.,]+
     const extractPrice = isin => {
-      const m = t.match(new RegExp('(\\d{2,3}[.,]\\d{3,6})\\s+[\\d.,]+\\s+' + isin));
+      const m = t.match(new RegExp('(\\d{2,3}[.,]\\d{3,6})\\s+\\S+\\s+' + isin));
       if (m) return parseFloat(m[1].replace(',', '.'));
       return null;
     };
@@ -2723,7 +2737,10 @@ function showTab(t) {
     // Accrual: TDs — find principal amounts and interest rates
     // "Transaction Amount [principal] [next_int]" appears in each TD section
     let accrualV = 0;
-    const tdSec = t.match(/TIME DEPOSIT\b[\s\S]*?(?=BONDS\s|Total BONDS)/i)?.[0] || '';
+    // TD detail section has "Account Number" header; prefer it over summary-page match
+    // (summary page also contains "TIME DEPOSIT" but stops at "BONDS" on the same page)
+    const tdSec = t.match(/TIME DEPOSIT\s+Account\s+Number[\s\S]*?(?=BONDS\s+Currency|Account Total in BONDS)/i)?.[0]
+                  || t.match(/TIME DEPOSIT\b[\s\S]*?(?=BONDS\s|Total BONDS)/i)?.[0] || '';
     for (const m of tdSec.matchAll(/Transaction\s+Amount\s+([\d.,]+)/gi)) {
       const principal = parseNum(m[1]);
       if (principal < 5000) continue;
