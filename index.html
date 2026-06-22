@@ -1046,6 +1046,14 @@ body::before {
             <label>Preço GIS</label>
             <input type="number" id="imp-pgm" placeholder="99.163" step="0.001" />
           </div>
+          <div class="cfg-field">
+            <label>Yield BAC (%)</label>
+            <input type="number" id="imp-ybac" placeholder="5.36" step="0.01" />
+          </div>
+          <div class="cfg-field">
+            <label>Preço BAC</label>
+            <input type="number" id="imp-pbac" placeholder="99.42" step="0.001" />
+          </div>
         </div>
       </div>
 
@@ -1348,55 +1356,13 @@ body::before {
       <div class="section-line"></div>
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="showTab('bonds')">Bonds (2)</button>
+      <button class="tab active" onclick="showTab('bonds')">Bonds (3)</button>
       <button class="tab" onclick="showTab('td')">Time Deposits (4)</button>
       <button class="tab" onclick="showTab('mf')">Mutual Fund (1)</button>
     </div>
 
     <div id="tab-bonds">
-      <div class="card">
-        <table class="asset-table">
-          <thead><tr>
-            <th>Ativo</th><th>ISIN</th><th>Rating</th>
-            <th>Face Value</th><th>Preço Compra</th><th>Preço Dez/25</th>
-            <th>Yield Compra</th><th>Yield Merc.</th><th>Accrued</th><th>Valor Posição</th><th>% Portf.</th>
-          </tr></thead>
-          <tbody>
-            <tr>
-              <td>
-                <span class="asset-name">US Treasury T 4⅜ 05/15/34</span>
-                <span class="asset-sub">Venc. 15/05/2034 · Cupom 4,375% sem.</span>
-              </td>
-              <td><span class="asset-sub">US91282CKQ32</span></td>
-              <td><span class="badge badge-gray">NR</span></td>
-              <td class="num-white">$144.000</td>
-              <td class="num">100,21</td>
-              <td class="num-white">102,19</td>
-              <td class="num">4,35%</td>
-              <td class="up">4,05%</td>
-              <td class="num">$800,55</td>
-              <td class="num-white"><strong>$147.951</strong></td>
-              <td><span class="badge badge-blue">44,86%</span></td>
-            </tr>
-            <tr>
-              <td>
-                <span class="asset-name">General Mills GIS 4.95 03/29/33</span>
-                <span class="asset-sub">Venc. 29/03/2033 · Cupom 4,95% sem. · Compra Mai/25</span>
-              </td>
-              <td><span class="asset-sub">US370334CT90</span></td>
-              <td><span class="badge badge-blue">BBB</span></td>
-              <td class="num-white">$50.000</td>
-              <td class="num">97,75</td>
-              <td class="num-white">101,50</td>
-              <td class="num">5,30%</td>
-              <td class="up">4,69%</td>
-              <td class="num">$632,50</td>
-              <td class="num-white"><strong>$51.381</strong></td>
-              <td><span class="badge badge-blue">15,58%</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="card" id="bonds-detail-card"></div>
       <div style="margin-top:1rem;">
         <div class="card-title" style="margin-bottom:.75rem;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Evolução do preço de mercado — US Treasury</div>
         <div class="card">
@@ -1485,7 +1451,7 @@ body::before {
         <div style="position:relative;width:100%;height:200px;"><canvas id="yieldChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Evolução do preço de mercado — ambos os bonds</div>
+        <div class="card-title">Evolução do preço de mercado — todos os bonds</div>
         <div style="position:relative;width:100%;height:200px;"><canvas id="bothPriceChart"></canvas></div>
       </div>
     </div>
@@ -1637,6 +1603,20 @@ body::before {
             <td class="dn">–$17.708</td>
             <td class="num">$475.120</td>
           </tr>
+          <tr data-year="2026">
+            <td><span class="asset-sub">Abr/2026</span></td>
+            <td><span class="badge badge-green">Aporte</span></td>
+            <td><span class="asset-sub">Transferência Alessandra S.R. Bertoni</span></td>
+            <td class="up">+$3.000</td>
+            <td class="num">—</td>
+          </tr>
+          <tr data-year="2026">
+            <td><span class="asset-sub">Abr/2026</span></td>
+            <td><span class="badge badge-blue">Compra</span></td>
+            <td><span class="asset-sub">Compra $100k Bank of America 5.288 04/25/34 — ISIN US06051GMA49</span></td>
+            <td class="dn">–$99.240</td>
+            <td class="num">$479.673</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1750,6 +1730,8 @@ const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05
 const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69,4.72,4.57,5.09,5.13,5.05];
 const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188,101.883,103.836,101.383,100.371,100.039];
 const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496,101.334,102.188,99.163,98.918,99.399];
+const yBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,5.40,5.36];
+const pBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,99.24,99.42];
 const bondsPct = bonds.map((b,i) => total[i]>0 ? +(b/total[i]*100).toFixed(1) : 0);
 
 // Aportes externos (transferências bancárias entradas)
@@ -1775,7 +1757,7 @@ const rentAcum = (() => {
 })();
 
 const events = {
-  1:['Aportes $10k'], 2:['Novo TD 4,70%'], 4:['Aporte $48k','Compra GIS'],
+  1:['Aportes $10k'], 2:['Novo TD 4,70%'], 4:['Aporte $48k','Compra GIS'], 16:['Aporte $3k','Compra BAC'],
   5:['Juros TDs'], 6:['Compra Fundo'], 8:['Aportes $11,5k'], 9:['Amp. Fundo'],
   10:['Cupom Treasury','Cupom GIS'],
   13:['Aporte $200k','Saída $30,3k'], 15:['Saída $17,7k']
@@ -1817,12 +1799,12 @@ function updateHeader(key) {
   document.getElementById('hero-period-strong').textContent = d.heroPeriod;
 }
 
-// Acruamento de juros mensal estimado (Treasury + TDs + GIS)
-// Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206
+// Acruamento de juros mensal estimado (Treasury + TDs + GIS + BAC)
+// Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206; BAC: $100k × 5,288%/12 = $441
 const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1139,1577];
 
 // Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
-// Treasury face $144k, GIS face $50k (a partir de Mai/25), MF variação de NAV
+// Treasury face $144k, GIS face $50k (a partir de Mai/25), BAC face $100k (a partir de Abr/26), MF variação de NAV
 const mtm = [null,451,3105,596,416,-1892,2119,-1072,2595,955,508,1606,-2051,-428,3240,-11017,414,1321];
 
 const gc = { grid:'rgba(0,40,100,0.10)', tick:'rgba(20,50,100,0.65)' };
@@ -1874,6 +1856,52 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
     `;
     tb.appendChild(tr);
   }
+})();
+
+// ── BONDS DETAIL TABLE ──
+(function renderBondsDetail() {
+  const li = months.length - 1;
+  const lastLabel = months[li];
+  const bondCfg = [
+    { name:'US Treasury T 4⅜ 05/15/34', sub:'Venc. 15/05/2034 · Cupom 4,375% sem.', isin:'US91282CKQ32',
+      badge:'gray', rating:'NR', face:144000, pBuy:100.21, yBuy:4.35, yArr:yTreas, pArr:pTreas, color:'blue' },
+    { name:'General Mills GIS 4.95 03/29/33', sub:'Venc. 29/03/2033 · Cupom 4,95% sem. · Compra Mai/25', isin:'US370334CT90',
+      badge:'blue', rating:'BBB', face:50000, pBuy:97.75, yBuy:5.30, yArr:yGM, pArr:pGM, color:'blue' },
+    { name:'Bank of America 5.288 04/25/34', sub:'Venc. 25/04/2034 · Cupom 5,288% sem. · Compra Abr/26', isin:'US06051GMA49',
+      badge:'green', rating:'A−', face:100000, pBuy:99.24, yBuy:5.40, yArr:yBAC, pArr:pBAC, color:'green' }
+  ];
+  const fmtN = (v,d) => v.toFixed(d).replace('.',',');
+  const fmtD = v => '$' + Math.round(v).toLocaleString('pt-BR');
+  let rows = '';
+  bondCfg.forEach(b => {
+    const yMkt = b.yArr[li], pMkt = b.pArr[li];
+    if (yMkt === null && pMkt === null) return;
+    const posClean = b.face * (pMkt || b.pBuy) / 100;
+    const cpnRate = parseFloat(b.sub.match(/Cupom ([\d,]+)%/)?.[1]?.replace(',','.') || 0);
+    const accr = b.face * cpnRate / 100 / 12;
+    const posVal = posClean + accr;
+    const pctPort = (posVal / total[li] * 100).toFixed(2).replace('.',',');
+    const yDir = yMkt !== null && yMkt < b.yBuy ? 'up' : 'dn';
+    rows += `<tr>
+      <td><span class="asset-name">${b.name}</span><span class="asset-sub">${b.sub}</span></td>
+      <td><span class="asset-sub">${b.isin}</span></td>
+      <td><span class="badge badge-${b.badge}">${b.rating}</span></td>
+      <td class="num-white">$${b.face.toLocaleString('pt-BR')}</td>
+      <td class="num">${fmtN(b.pBuy,2)}</td>
+      <td class="num-white">${pMkt !== null ? fmtN(pMkt,2) : '—'}</td>
+      <td class="num">${fmtN(b.yBuy,2)}%</td>
+      <td class="${yDir}">${yMkt !== null ? fmtN(yMkt,2)+'%' : '—'}</td>
+      <td class="num">${fmtD(accr)}</td>
+      <td class="num-white"><strong>${fmtD(posVal)}</strong></td>
+      <td><span class="badge badge-${b.color}">${pctPort}%</span></td>
+    </tr>`;
+  });
+  document.getElementById('bonds-detail-card').innerHTML = `<table class="asset-table">
+    <thead><tr>
+      <th>Ativo</th><th>ISIN</th><th>Rating</th>
+      <th>Face Value</th><th>Preço Compra</th><th>Preço ${lastLabel}</th>
+      <th>Yield Compra</th><th>Yield Merc.</th><th>Accrued</th><th>Valor Posição</th><th>% Portf.</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
 })();
 
 // ── MONTH NAVIGATOR ──
@@ -2035,7 +2063,9 @@ const allEvents = {
   11: [{icon:'💰', text:'Cupom semestral US Treasury T 4⅜ — $3.150', type:'cupom'}],
   13: [{icon:'💵', text:'Aporte externo de $200.000', type:'aporte'},
        {icon:'🏠', text:'Pagamento Rybovich Marina — $30.320 (saída externa)', type:'saida'}],
-  15: [{icon:'🏠', text:'Pagamento RYBO PROPERTY — $17.708 (saída externa)', type:'saida'}]
+  15: [{icon:'🏠', text:'Pagamento RYBO PROPERTY — $17.708 (saída externa)', type:'saida'}],
+  16: [{icon:'💵', text:'Aporte externo de $3.000', type:'aporte'},
+       {icon:'📈', text:'Compra $100k Bank of America 5.288 — ISIN US06051GMA49', type:'compra'}]
 };
 const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(--blue)', cupom:'var(--accent)', saida:'var(--red)' };
 
@@ -2325,6 +2355,7 @@ new Chart(document.getElementById('yieldChart'),{
     datasets:[
       {label:'US Treasury',data:yTreas,borderColor:'#4a90d9',borderWidth:2,tension:.35,fill:false,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#4a90d9'},
       {label:'General Mills',data:yGM,borderColor:'#4caf7d',borderWidth:2,tension:.35,fill:false,pointRadius:3,pointHoverRadius:5,spanGaps:false,pointBackgroundColor:'#4caf7d'},
+      {label:'Bank of America',data:yBAC,borderColor:'#d4894a',borderWidth:2,tension:.35,fill:false,pointRadius:3,pointHoverRadius:5,spanGaps:false,pointBackgroundColor:'#d4894a'},
     ]
   },
   options:{
@@ -2348,6 +2379,7 @@ new Chart(document.getElementById('bothPriceChart'),{
     datasets:[
       {label:'US Treasury',data:pTreas,borderColor:'#4a90d9',borderWidth:2,tension:.35,fill:false,pointRadius:2,pointHoverRadius:5},
       {label:'General Mills',data:pGM,borderColor:'#4caf7d',borderWidth:2,tension:.35,fill:false,pointRadius:2,spanGaps:false,pointHoverRadius:5},
+      {label:'Bank of America',data:pBAC,borderColor:'#d4894a',borderWidth:2,tension:.35,fill:false,pointRadius:2,spanGaps:false,pointHoverRadius:5},
     ]
   },
   options:{
@@ -2475,6 +2507,8 @@ function showTab(t) {
     const nYGM       = JSON.stringify(removeAt(yGM, idx));
     const nPTreas    = JSON.stringify(removeAt(pTreas, idx));
     const nPGM       = JSON.stringify(removeAt(pGM, idx));
+    const nYBAC      = JSON.stringify(removeAt(yBAC, idx));
+    const nPBAC      = JSON.stringify(removeAt(pBAC, idx));
     const nAportes   = JSON.stringify(removeAt(aportes, idx));
     const nSaidas    = JSON.stringify(removeAt(saidas, idx));
     const nAccrual   = JSON.stringify(removeAt(accrual, idx));
@@ -2501,6 +2535,8 @@ function showTab(t) {
       html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
       html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
       html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+      html = html.replace(/const yBAC\s*= \[.*\]/,   'const yBAC   = ' + nYBAC);
+      html = html.replace(/const pBAC\s*= \[.*\]/,   'const pBAC   = ' + nPBAC);
       html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
       html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
       html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
@@ -2716,6 +2752,8 @@ function showTab(t) {
     const yGMV    = gisBlock   ? extractYield(gisBlock)       : null;
     const pTreasV = treasBlock ? extractPrice('US91282CKQ32') : null;
     const yTreasV = treasBlock ? extractYield(treasBlock)     : null;
+    const pBACv   = bacBlock   ? extractPrice('US06051GMA49') : null;
+    const yBACv   = bacBlock   ? extractYield(bacBlock)       : null;
 
     // External payments (saidas): EXT PMT debits
     let saidasV = 0;
@@ -2787,6 +2825,13 @@ function showTab(t) {
       const fM = gisBlock.match(/([\d.,]+)\s+\d+[.,]\d+%/);
       mtmV += (pGMV - prevPG) / 100 * (fM ? parseNum(fM[1]) : 50000);
     }
+    if (pBACv && pBAC.length) {
+      const prevPB = pBAC[pBAC.length - 1];
+      if (prevPB !== null) {
+        const fM = bacBlock.match(/([\d.,]+)\s+\d+[.,]\d+%/);
+        mtmV += (pBACv - prevPB) / 100 * (fM ? parseNum(fM[1]) : 100000);
+      }
+    }
     // MF MtM: current value − (prev value − redemptions)
     const prevMF = mf[mf.length - 1] || 0;
     if (mfV && prevMF) mtmV += mfV - (prevMF - fundRedemptions);
@@ -2794,7 +2839,8 @@ function showTab(t) {
 
     return { label, fullName, year, total: totalV, bonds: bondsV, tds: tdsV,
              mf: mfV, cash: cashV, pTreas: pTreasV, yTreas: yTreasV,
-             pGM: pGMV, yGM: yGMV, saidas: saidasV, aportes: aportesV,
+             pGM: pGMV, yGM: yGMV, pBAC: pBACv, yBAC: yBACv,
+             saidas: saidasV, aportes: aportesV,
              accrual: accrualV, mtm: mtmV };
   }
 
@@ -2842,7 +2888,7 @@ function showTab(t) {
   window.openImport = function(data) {
     // Clear all fields first
     ['imp-label','imp-fullname','imp-total','imp-bonds','imp-tds','imp-mf',
-     'imp-ytreas','imp-ptreas','imp-ygm','imp-pgm','imp-mtm','imp-events'].forEach(id => {
+     'imp-ytreas','imp-ptreas','imp-ygm','imp-pgm','imp-ybac','imp-pbac','imp-mtm','imp-events'].forEach(id => {
       document.getElementById(id).value = '';
     });
     document.getElementById('imp-aportes').value = '0';
@@ -2866,6 +2912,8 @@ function showTab(t) {
       set('imp-ptreas',   data.pTreas  !== null ? data.pTreas : (pTreas[lastI] ?? ''));
       set('imp-ygm',      data.yGM     !== null ? data.yGM    : (yGM[lastI]   ?? ''));
       set('imp-pgm',      data.pGM     !== null ? data.pGM    : (pGM[lastI]   ?? ''));
+      set('imp-ybac',     data.yBAC    !== null ? data.yBAC   : (yBAC[lastI]  ?? ''));
+      set('imp-pbac',     data.pBAC    !== null ? data.pBAC   : (pBAC[lastI]  ?? ''));
       set('imp-aportes',  data.aportes || 0);
       set('imp-saidas',   data.saidas  || 0);
       set('imp-accrual',  data.accrual || 0);
@@ -2896,6 +2944,8 @@ function showTab(t) {
       if (pTreas[li])  document.getElementById('imp-ptreas').value  = pTreas[li];
       if (yGM[li])     document.getElementById('imp-ygm').value     = yGM[li];
       if (pGM[li])     document.getElementById('imp-pgm').value     = pGM[li];
+      if (yBAC[li])    document.getElementById('imp-ybac').value    = yBAC[li];
+      if (pBAC[li])    document.getElementById('imp-pbac').value    = pBAC[li];
     }
     document.getElementById('imp-overlay').style.display = 'flex';
   };
@@ -2943,6 +2993,8 @@ function showTab(t) {
     const pTreasV  = parseFloat(document.getElementById('imp-ptreas').value);
     const yGMV     = document.getElementById('imp-ygm').value !== '' ? parseFloat(document.getElementById('imp-ygm').value) : null;
     const pGMV     = document.getElementById('imp-pgm').value !== '' ? parseFloat(document.getElementById('imp-pgm').value) : null;
+    const yBACv    = document.getElementById('imp-ybac').value !== '' ? parseFloat(document.getElementById('imp-ybac').value) : null;
+    const pBACv    = document.getElementById('imp-pbac').value !== '' ? parseFloat(document.getElementById('imp-pbac').value) : null;
     const aportesV = parseFloat(document.getElementById('imp-aportes').value) || 0;
     const saidasV  = parseFloat(document.getElementById('imp-saidas').value)  || 0;
     const accrualV = parseFloat(document.getElementById('imp-accrual').value);
@@ -2973,6 +3025,8 @@ function showTab(t) {
     const nYGM       = isUpdate ? JSON.stringify(replaceAt(yGM, existIdx, yGMV))        : JSON.stringify([...yGM, yGMV]);
     const nPTreas    = isUpdate ? JSON.stringify(replaceAt(pTreas, existIdx, pTreasV))  : JSON.stringify([...pTreas, pTreasV]);
     const nPGM       = isUpdate ? JSON.stringify(replaceAt(pGM, existIdx, pGMV))        : JSON.stringify([...pGM, pGMV]);
+    const nYBAC      = isUpdate ? JSON.stringify(replaceAt(yBAC, existIdx, yBACv))      : JSON.stringify([...yBAC, yBACv]);
+    const nPBAC      = isUpdate ? JSON.stringify(replaceAt(pBAC, existIdx, pBACv))      : JSON.stringify([...pBAC, pBACv]);
     const nAportes   = isUpdate ? JSON.stringify(replaceAt(aportes, existIdx, aportesV)): JSON.stringify([...aportes, aportesV]);
     const nSaidas    = isUpdate ? JSON.stringify(replaceAt(saidas, existIdx, saidasV))  : JSON.stringify([...saidas, saidasV]);
     const nAccrual   = isUpdate ? JSON.stringify(replaceAt(accrual, existIdx, accrualV)): JSON.stringify([...accrual, accrualV]);
@@ -3002,6 +3056,8 @@ function showTab(t) {
     html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
     html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
     html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+    html = html.replace(/const yBAC\s*= \[.*\]/,   'const yBAC   = ' + nYBAC);
+    html = html.replace(/const pBAC\s*= \[.*\]/,   'const pBAC   = ' + nPBAC);
     html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
     html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
     html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
@@ -3019,6 +3075,8 @@ function showTab(t) {
       html = html.replace(/const yGM\s*= \[.*\]/,    'const yGM    = ' + nYGM);
       html = html.replace(/const pTreas = \[.*\]/,   'const pTreas = ' + nPTreas);
       html = html.replace(/const pGM\s*= \[.*\]/,    'const pGM    = ' + nPGM);
+      html = html.replace(/const yBAC\s*= \[.*\]/,   'const yBAC   = ' + nYBAC);
+      html = html.replace(/const pBAC\s*= \[.*\]/,   'const pBAC   = ' + nPBAC);
       html = html.replace(/const aportes = \[.*\]/,  'const aportes = ' + nAportes);
       html = html.replace(/const saidas\s*= \[.*\]/, 'const saidas  = ' + nSaidas);
       html = html.replace(/const accrual = \[.*\]/,  'const accrual = ' + nAccrual);
