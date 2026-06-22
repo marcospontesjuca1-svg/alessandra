@@ -1613,8 +1613,8 @@ body::before {
           <tr data-year="2026">
             <td><span class="asset-sub">Abr/2026</span></td>
             <td><span class="badge badge-blue">Compra</span></td>
-            <td><span class="asset-sub">Compra $100k Bank of America 5.288 04/25/34 — ISIN US06051GMA49</span></td>
-            <td class="dn">–$99.240</td>
+            <td><span class="asset-sub">Compra $96k Bank of America 5.468 01/23/35 — preço 103,00 — ISIN US06051GMA49</span></td>
+            <td class="dn">–$98.880</td>
             <td class="num">$479.673</td>
           </tr>
         </tbody>
@@ -1730,8 +1730,8 @@ const yTreas = [4.55,4.51,4.22,4.17,4.18,4.35,4.13,4.29,4.10,4.05,4.00,3.87,4.05
 const yGM    = [null,null,null,null,null,5.13,4.91,4.99,4.83,4.72,4.70,4.60,4.69,4.72,4.57,5.09,5.13,5.05];
 const pTreas = [98.625,98.938,101.094,101.508,101.797,100.102,101.227,100.523,101.930,102.320,102.625,103.516,102.188,101.883,103.836,101.383,100.371,100.039];
 const pGM    = [null,null,null,null,null,98.846,99.844,99.728,100.713,101.367,101.505,102.065,101.496,101.334,102.188,99.163,98.918,99.399];
-const yBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,5.40,5.36];
-const pBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,99.24,99.42];
+const yBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,5.00,5.12];
+const pBAC   = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,103.00,102.17];
 const bondsPct = bonds.map((b,i) => total[i]>0 ? +(b/total[i]*100).toFixed(1) : 0);
 
 // Aportes externos (transferências bancárias entradas)
@@ -1800,7 +1800,7 @@ function updateHeader(key) {
 }
 
 // Acruamento de juros mensal estimado (Treasury + TDs + GIS + BAC)
-// Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206; BAC: $100k × 5,288%/12 = $441
+// Treasury: $144k × 4,375%/12 = $525; TDs: $90k × 5,44%/12 = $408; TD novo: $14k × 4,70%/12 = $55; GIS: $50k × 4,95%/12 = $206; BAC: $96k × 5,468%/12 = $437
 const accrual = [null,933,933,988,988,1194,1194,1194,1194,1194,1194,1194,1194,1194,1139,1139,1139,1577];
 
 // Marcação a mercado mensal — variação de preço dos bonds × face value + variação NAV do fundo
@@ -1867,8 +1867,8 @@ const pctFmt = (v,dec=2) => v===null ? '—' : (v>=0?'<span class="up">+':'<span
       badge:'gray', rating:'NR', face:144000, pBuy:100.21, yBuy:4.35, yArr:yTreas, pArr:pTreas, color:'blue' },
     { name:'General Mills GIS 4.95 03/29/33', sub:'Venc. 29/03/2033 · Cupom 4,95% sem. · Compra Mai/25', isin:'US370334CT90',
       badge:'blue', rating:'BBB', face:50000, pBuy:97.75, yBuy:5.30, yArr:yGM, pArr:pGM, color:'blue' },
-    { name:'Bank of America 5.288 04/25/34', sub:'Venc. 25/04/2034 · Cupom 5,288% sem. · Compra Abr/26', isin:'US06051GMA49',
-      badge:'green', rating:'A−', face:100000, pBuy:99.24, yBuy:5.40, yArr:yBAC, pArr:pBAC, color:'green' }
+    { name:'Bank of America 5.468 01/23/35', sub:'Venc. 23/01/2035 · Cupom 5,468% sem. · Compra Abr/26', isin:'US06051GMA49',
+      badge:'green', rating:'A+', face:96000, pBuy:103.00, yBuy:5.00, yArr:yBAC, pArr:pBAC, color:'green' }
   ];
   const fmtN = (v,d) => v.toFixed(d).replace('.',',');
   const fmtD = v => '$' + Math.round(v).toLocaleString('pt-BR');
@@ -2065,7 +2065,7 @@ const allEvents = {
        {icon:'🏠', text:'Pagamento Rybovich Marina — $30.320 (saída externa)', type:'saida'}],
   15: [{icon:'🏠', text:'Pagamento RYBO PROPERTY — $17.708 (saída externa)', type:'saida'}],
   16: [{icon:'💵', text:'Aporte externo de $3.000', type:'aporte'},
-       {icon:'📈', text:'Compra $100k Bank of America 5.288 — ISIN US06051GMA49', type:'compra'}]
+       {icon:'📈', text:'Compra $96k Bank of America 5.468 — preço 103,00', type:'compra'}]
 };
 const eventColors = { aporte:'var(--green)', invest:'var(--amber)', compra:'var(--blue)', cupom:'var(--accent)', saida:'var(--red)' };
 
@@ -2829,7 +2829,7 @@ function showTab(t) {
       const prevPB = pBAC[pBAC.length - 1];
       if (prevPB !== null) {
         const fM = bacBlock.match(/([\d.,]+)\s+\d+[.,]\d+%/);
-        mtmV += (pBACv - prevPB) / 100 * (fM ? parseNum(fM[1]) : 100000);
+        mtmV += (pBACv - prevPB) / 100 * (fM ? parseNum(fM[1]) : 96000);
       }
     }
     // MF MtM: current value − (prev value − redemptions)
